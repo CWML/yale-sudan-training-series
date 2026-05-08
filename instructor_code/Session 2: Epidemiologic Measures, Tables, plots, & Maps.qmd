@@ -1,0 +1,28 @@
+---
+title: "Session 2: Epidemiologic Measures, Tables, plots, & Maps"
+author: "Max Wegener"
+format: html
+editor: visual
+---
+
+Descriptive Tables
+
+Case control and cohort studies
+
+-   OR
+
+-   RR
+
+-   SA
+
+-   HR
+
+-   Attack rates
+
+Simple stats
+
+Epi curves
+
+GIS mapping using R
+
+-   Shape files

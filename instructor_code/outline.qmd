@@ -1,0 +1,180 @@
+---
+title: "Yale/Sudan outline"
+format: html
+editor: visual
+---
+
+What are the dates and time EST?
+
+3 full days or 5 half days
+
+# Materials
+
+1.  ~~R project~~
+2.  Readme
+3.  ~~Disease linelist for training~~
+    -   ~~Malaria~~
+    -   ~~Dengue~~
+    -   ~~Cholera~~
+4.  ~~Sudan shape files~~
+5.  Use teaching assistants for trouble shooting
+6.  best way to trouble shoot issues via zoom?
+    -   discuss issues during the class for some and use breakout rooms for others
+7.  breakout room for group exercises?
+
+We can teach using one dataset and they follow along with another - basically they will create a "report" with all the code and visualizations in a qmd file?
+
+# Session 0 - Computer setup / configuration
+
+What software or other configurations are needed before the start of the 3-day session?
+
+1.  R
+2.  **Rstudio or positron?**
+3.  git
+4.  Rtools?
+5.  R environment set up? Aptainer setup?
+    1.  leaning toward pacman() so they will have access to these packages on their computers n the future
+6.  gofortran (depending on OS and R version)
+
+packages
+
+```{r}
+
+pacman::p_load(
+     
+     # learning R
+     ############
+     learnr,   # interactive tutorials in RStudio Tutorial pane
+     swirl,    # interactive tutorials in R console
+        
+     # project and file management
+     #############################
+     here,     # file paths relative to R project root folder
+     rio,      # import/export of many types of data
+     openxlsx, # import/export of multi-sheet Excel workbooks 
+     
+     # package install and management
+     ################################
+     pacman,   # package install/load
+     renv,     # managing versions of packages when working in collaborative groups
+     remotes,  # install from github
+     
+     # General data management
+     #########################
+     tidyverse,    # includes many packages for tidy data wrangling and presentation
+          #dplyr,      # data management
+          #tidyr,      # data management
+          #ggplot2,    # data visualization
+          #stringr,    # work with strings and characters
+          #forcats,    # work with factors 
+          #lubridate,  # work with dates
+          #purrr       # iteration and working with lists
+     linelist,     # cleaning linelists
+     naniar,       # assessing missing data
+     
+     # statistics  
+     ############
+     janitor,      # tables and data cleaning
+     gtsummary,    # making descriptive and statistical tables
+     rstatix,      # quickly run statistical tests and summaries
+     broom,        # tidy up results from regressions
+     lmtest,       # likelihood-ratio tests
+     easystats,
+          # parameters, # alternative to tidy up results from regressions
+          # see,        # alternative to visualise forest plots 
+     
+     # epidemic modeling
+     ###################
+     epicontacts,  # Analysing transmission networks
+     EpiNow2,      # Rt estimation
+     EpiEstim,     # Rt estimation
+     projections,  # Incidence projections
+     incidence2,   # Make epicurves and handle incidence data
+     i2extras,     # Extra functions for the incidence2 package
+     epitrix,      # Useful epi functions
+     distcrete,    # Discrete delay distributions
+     
+     
+     # plots - general
+     #################
+     #ggplot2,         # included in tidyverse
+     cowplot,          # combining plots  
+     # patchwork,      # combining plots (alternative)     
+     RColorBrewer,     # color scales
+     ggnewscale,       # to add additional layers of color schemes
+
+     
+     # plots - specific types
+     ########################
+     DiagrammeR,       # diagrams using DOT language
+     incidence2,       # epidemic curves
+     gghighlight,      # highlight a subset
+     ggrepel,          # smart labels
+     plotly,           # interactive graphics
+     gganimate,        # animated graphics 
+
+     
+     # gis
+     ######
+     sf,               # to manage spatial data using a Simple Feature format
+     tmap,             # to produce simple maps, works for both interactive and static maps
+     OpenStreetMap,    # to add OSM basemap in ggplot map
+     spdep,            # spatial statistics 
+     
+     # routine reports
+     #################
+     rmarkdown,        # produce PDFs, Word Documents, Powerpoints, and HTML files
+     reportfactory,    # auto-organization of R Markdown outputs
+     officer,          # powerpoints
+     
+     # dashboards
+     ############
+     flexdashboard,    # convert an R Markdown script into a dashboard
+     shiny,            # interactive web apps
+     
+     # tables for presentation
+     #########################
+     knitr,            # R Markdown report generation and html tables
+     flextable,        # HTML tables
+     #DT,              # HTML tables (alternative)
+     #gt,              # HTML tables (alternative)
+     #huxtable,        # HTML tables (alternative) 
+     
+     # phylogenetics
+     ###############
+     ggtree,           # visualization and annotation of trees
+     ape,              # analysis of phylogenetics and evolution
+     treeio            # to visualize phylogenetic files
+ 
+)
+```
+
+# Session 1 - R & Data Wrangling for Epidemiology
+
+## Tour R studio or Positron - Sofia
+
+## Introduction to R coding - Sofia
+
+-   ARCS session 2 stuff
+-   discuss packages
+-   coding environments
+
+## Data management using R projects - Levi
+
+## Intro to markdown syntax and QMD -Levi
+
+-   discuss source() functionality?
+
+## The tidyverse - Max
+
+## Importing data - Max
+
+Where are their data normally kept?
+
+## Data cleaning and validation (inspecting) - Max
+
+Example of what the data actually look like fo reach illness
+
+# Session 2 - Epidemiologic Measures, Tables, plots, & Maps
+
+# Session 3 -Outbreak Detection, Modeling, Forecasting, and Reporting

@@ -1,0 +1,159 @@
+---
+title: "Session 1: Tidyverse, importing data, data cleaning and validation"
+author: "Max Wegener"
+format: html
+editor: visual
+---
+
+# Overview
+
+qfqfqq
+
+# Packages used for this session
+
+```{r}
+pacman::p_load(
+  rio,        # importing data  
+  here,       # relative file pathways  
+  janitor,    # data cleaning and tables
+  lubridate,  # working with dates
+  matchmaker, # dictionary-based cleaning
+  epikit,     # age_categories() function
+  tidyverse,  # data management and visualization
+  skimr
+)
+```
+
+# Importing data into R using Rio() and Here()
+
+## Quick background
+
+### Base R
+
+-   This is the original, old school way of reading `.csv`, `.txt`, and `.dat` files and returns a data frame in the R environment using the function read.*csv,* read.*table*, etc.
+
+-   Cumbersome - it reacquires additional manual coding specifications based on the file type; it can be slow for large data sets; and can lead to unexpected behaviors with certain column types (i.e. converting character columns into factors)
+
+### readr()
+
+-   Modern alternative to *Base R* and requires less configuration while being faster, cleaner, and provides less coding headaches (its does not convert character columns into factors) and uses the fucntion read\_*csv,* read\_*tsv,* etc.
+
+-   Returns a *tibble,* a modern data frame with features that make it print nicely, displays on a screen better, does not change variables names, and does not use row labels. The output when inspecting the data set using *str()* are nicer looking and more informative
+
+### haven()
+
+-   The **`haven`** package is the dedicated tool for reading proprietary formats like SPSS (`.sav`), SAS (`.xpt` & `.sas7bdat`), and Stata (`.dta`), and is a key part of the Tidyverse ecosystem.
+
+### openxlsx()
+
+-   The **`openxlsx`** package is the dedicated tool for reading and writing data from **Excel files** (`.xlsx`) without needing external dependencies like Java. It is widely used for working with multi-sheet workbooks, applying styles, and handling complex Excel features, offering functions like `read.xlsx()` for import. 
+
+## Why use rio() andf here()n instead of base R?
+
+### rio()
+
+-   Is highly useful because it provides a single, **universal function** for importing virtually any data file format.
+
+-   The `import()` function automatically **detects the file type** based on the file extension (e.g., `.csv`, `.xlsx`, `.RData`, `.rds`, `.xpt`, `.sas7bdat`, `.dta`, `.sav`, `.json,.txt`, `.dat`) and uses the appropriate specialized package (`readr`,`haven`, and `openxlsx`) to import it.
+
+### here()
+
+-   The package **here** and its function `here()` make it easy to tell R where to find and to save your files - in essence, it builds file paths.
+
+-   Using **here()** works with you **R Project** to eliminate path roblems -\> Relative paths = good for sharing; Absolute paths = Bad for sharing
+
+    -   **Bad:** `"/Users/mwegener/Desktop/maybe_here/data.csv"`
+
+    -   **Good:** `here("raw_data", "data.csv")`
+
+-   This is useful when the R project may be shared or accessed by multiple people/computers
+
+```{r}
+# if your .xlsx has multiple sheets:
+# my_data <- import(here("FOLDER NAME", "DATA_FILE.xlsx"), which = "SHEET_NAME")
+
+cholera_linelist_raw <- import(here('raw_data', 'cholera_linelist_2025_sudan.csv'))
+```
+
+# Data cleaning and validation
+
+<https://epirhandbook.com/en/new_pages/cleaning.html>
+
+## The Tidyverse
+
+### **A Unified Data Science Ecosystem**
+
+The **tidyverse** is a collection of R packages designed around shared principles for efficient, readable data analysis. Install all packages at once with `install.packages("tidyverse")` and load with `library(tidyverse)`.
+
+### **Core Philosophy:**
+
+-   **Tidy data structure**: Each variable = column, each observation = row, each value = cell
+
+-   **Consistent syntax**: Predictable function behavior across all packages
+
+-   **Human-centered design**: Intuitive functions that reduce learning curve
+
+-   **Pipe workflows**: Use `%>%` to chain operations for readable, step-by-step analysis
+
+### **Key Benefits:**
+
+-   **Uniform data structures** using data frames/tibbles
+
+-   **Reproducible analysis** with version control emphasis
+
+-   **Clean naming conventions** (lowercase_with_underscores)
+
+-   **Active community** support and best practices
+
+-   **Functional pipelines** that transform data through logical steps
+
+### Core Functions
+
+| Function | Utility | Package |
+|----|----|----|
+| `%>%` | “pipe” (pass) data from one function to the next | **magrittr** |
+| `mutate()` | create, transform, and re-define columns | **dplyr** |
+| `select()` | keep, remove, select, or re-name columns | **dplyr** |
+| `rename()` | rename columns | **dplyr** |
+| `clean_names()` | standardize the syntax of column names | **janitor** |
+| `as.character()`, `as.numeric()`, `as.Date()`, etc. | convert the class of a column | **base** R |
+| `across()` | transform multiple columns at one time | **dplyr** |
+| **tidyselect** functions | use logic to select columns | **tidyselect** |
+| `filter()` | keep certain rows | **dplyr** |
+| `distinct()` | de-duplicate rows | **dplyr** |
+| `rowwise()` | operations by/within each row | **dplyr** |
+| `add_row()` | add rows manually | **tibble** |
+| `arrange()` | sort rows | **dplyr** |
+| `recode()` | re-code values in a column | **dplyr** |
+| `case_when()` | re-code values in a column using more complex logical criteria | **dplyr** |
+| `replace_na()`, `na_if()`, `coalesce()` | special functions for re-coding | **tidyr** |
+| `age_categories()`and `cut()` | create categorical groups from a numeric column | **epikit** and **base** R |
+| `match_df()` | re-code/clean values using a data dictionary | **matchmaker** |
+| `which()` | apply logical criteria; return indices | **base** R |
+
+## Step 1: inspect the data
+
+### Inspecting data helps identify potential problems before analysis and plan your data cleaning strategy by verifying:
+
+-   Data imported correctly
+
+-   Variable types are appropriate
+
+-   Value formatting is consistent
+
+-   Missing value patterns
+
+-   Duplicate records
+
+-   Data set structure and dimensions
+
+-   **If column names are clean (concise, no spaces, no blanks, no dots, no caps)**
+
+```{r}
+#from skimr package
+skim(cholera_linelist_raw)
+```
+
+### what issues did you identify?
+
+## Step 2: 
