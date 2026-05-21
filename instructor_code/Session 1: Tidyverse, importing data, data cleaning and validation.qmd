@@ -30,49 +30,49 @@ pacman::p_load(
 
 ### Base R
 
--   This is the original, old school way of reading `.csv`, `.txt`, and `.dat` files and returns a data frame in the R environment using the function read.*csv,* read.*table*, etc.
+- This is the original, old school way of reading `.csv`, `.txt`, and `.dat` files and returns a data frame in the R environment using the function read.*csv,* read.*table*, etc.
 
--   Cumbersome - it reacquires additional manual coding specifications based on the file type; it can be slow for large data sets; and can lead to unexpected behaviors with certain column types (i.e. converting character columns into factors)
+- Cumbersome - it reacquires additional manual coding specifications based on the file type; it can be slow for large data sets; and can lead to unexpected behaviors with certain column types (i.e. converting character columns into factors)
 
 ### readr()
 
--   Modern alternative to *Base R* and requires less configuration while being faster, cleaner, and provides less coding headaches (its does not convert character columns into factors) and uses the fucntion read\_*csv,* read\_*tsv,* etc.
+- Modern alternative to *Base R* and requires less configuration while being faster, cleaner, and provides less coding headaches (its does not convert character columns into factors) and uses the fucntion read\_*csv,* read\_*tsv,* etc.
 
--   Returns a *tibble,* a modern data frame with features that make it print nicely, displays on a screen better, does not change variables names, and does not use row labels. The output when inspecting the data set using *str()* are nicer looking and more informative
+- Returns a *tibble,* a modern data frame with features that make it print nicely, displays on a screen better, does not change variables names, and does not use row labels. The output when inspecting the data set using *str()* are nicer looking and more informative
 
 ### haven()
 
--   The **`haven`** package is the dedicated tool for reading proprietary formats like SPSS (`.sav`), SAS (`.xpt` & `.sas7bdat`), and Stata (`.dta`), and is a key part of the Tidyverse ecosystem.
+- The **`haven`** package is the dedicated tool for reading proprietary formats like SPSS (`.sav`), SAS (`.xpt` & `.sas7bdat`), and Stata (`.dta`), and is a key part of the Tidyverse ecosystem.
 
 ### openxlsx()
 
--   The **`openxlsx`** package is the dedicated tool for reading and writing data from **Excel files** (`.xlsx`) without needing external dependencies like Java. It is widely used for working with multi-sheet workbooks, applying styles, and handling complex Excel features, offering functions like `read.xlsx()` for import. 
+- The **`openxlsx`** package is the dedicated tool for reading and writing data from **Excel files** (`.xlsx`) without needing external dependencies like Java. It is widely used for working with multi-sheet workbooks, applying styles, and handling complex Excel features, offering functions like `read.xlsx()` for import. 
 
 ## Why use rio() andf here()n instead of base R?
 
 ### rio()
 
--   Is highly useful because it provides a single, **universal function** for importing virtually any data file format.
+- Is highly useful because it provides a single, **universal function** for importing virtually any data file format.
 
--   The `import()` function automatically **detects the file type** based on the file extension (e.g., `.csv`, `.xlsx`, `.RData`, `.rds`, `.xpt`, `.sas7bdat`, `.dta`, `.sav`, `.json,.txt`, `.dat`) and uses the appropriate specialized package (`readr`,`haven`, and `openxlsx`) to import it.
+- The `import()` function automatically **detects the file type** based on the file extension (e.g., `.csv`, `.xlsx`, `.RData`, `.rds`, `.xpt`, `.sas7bdat`, `.dta`, `.sav`, `.json,.txt`, `.dat`) and uses the appropriate specialized package (`readr`,`haven`, and `openxlsx`) to import it.
 
 ### here()
 
--   The package **here** and its function `here()` make it easy to tell R where to find and to save your files - in essence, it builds file paths.
+- The package **here** and its function `here()` make it easy to tell R where to find and to save your files - in essence, it builds file paths.
 
--   Using **here()** works with you **R Project** to eliminate path roblems -\> Relative paths = good for sharing; Absolute paths = Bad for sharing
+- Using **here()** works with you **R Project** to eliminate path roblems -\> Relative paths = good for sharing; Absolute paths = Bad for sharing
 
-    -   **Bad:** `"/Users/mwegener/Desktop/maybe_here/data.csv"`
+  - **Bad:** `"/Users/mwegener/Desktop/maybe_here/data.csv"`
 
-    -   **Good:** `here("raw_data", "data.csv")`
+  - **Good:** `here("raw_data", "data.csv")`
 
--   This is useful when the R project may be shared or accessed by multiple people/computers
+- This is useful when the R project may be shared or accessed by multiple people/computers
 
 ```{r}
 # if your .xlsx has multiple sheets:
 # my_data <- import(here("FOLDER NAME", "DATA_FILE.xlsx"), which = "SHEET_NAME")
 
-cholera_linelist_raw <- import(here('raw_data', 'cholera_linelist_2025_sudan.csv'))
+cholera_linelist_raw <- import(here('raw_data', 'cholera_linelist_2025_sudan.xlsx'))
 ```
 
 # Data cleaning and validation
@@ -87,73 +87,237 @@ The **tidyverse** is a collection of R packages designed around shared princip
 
 ### **Core Philosophy:**
 
--   **Tidy data structure**: Each variable = column, each observation = row, each value = cell
+- **Tidy data structure**: Each variable = column, each observation = row, each value = cell
 
--   **Consistent syntax**: Predictable function behavior across all packages
+- **Consistent syntax**: Predictable function behavior across all packages
 
--   **Human-centered design**: Intuitive functions that reduce learning curve
+- **Human-centered design**: Intuitive functions that reduce learning curve
 
--   **Pipe workflows**: Use `%>%` to chain operations for readable, step-by-step analysis
+- **Pipe workflows**: Use `%>%` to chain operations for readable, step-by-step analysis
 
 ### **Key Benefits:**
 
--   **Uniform data structures** using data frames/tibbles
+- **Uniform data structures** using data frames/tibbles
 
--   **Reproducible analysis** with version control emphasis
+- **Reproducible analysis** with version control emphasis
 
--   **Clean naming conventions** (lowercase_with_underscores)
+- **Clean naming conventions** (lowercase_with_underscores)
 
--   **Active community** support and best practices
+- **Active community** support and best practices
 
--   **Functional pipelines** that transform data through logical steps
+- **Functional pipelines** that transform data through logical steps
 
 ### Core Functions
 
-| Function | Utility | Package |
-|----|----|----|
-| `%>%` | “pipe” (pass) data from one function to the next | **magrittr** |
-| `mutate()` | create, transform, and re-define columns | **dplyr** |
-| `select()` | keep, remove, select, or re-name columns | **dplyr** |
-| `rename()` | rename columns | **dplyr** |
-| `clean_names()` | standardize the syntax of column names | **janitor** |
-| `as.character()`, `as.numeric()`, `as.Date()`, etc. | convert the class of a column | **base** R |
-| `across()` | transform multiple columns at one time | **dplyr** |
-| **tidyselect** functions | use logic to select columns | **tidyselect** |
-| `filter()` | keep certain rows | **dplyr** |
-| `distinct()` | de-duplicate rows | **dplyr** |
-| `rowwise()` | operations by/within each row | **dplyr** |
-| `add_row()` | add rows manually | **tibble** |
-| `arrange()` | sort rows | **dplyr** |
-| `recode()` | re-code values in a column | **dplyr** |
-| `case_when()` | re-code values in a column using more complex logical criteria | **dplyr** |
-| `replace_na()`, `na_if()`, `coalesce()` | special functions for re-coding | **tidyr** |
-| `age_categories()`and `cut()` | create categorical groups from a numeric column | **epikit** and **base** R |
-| `match_df()` | re-code/clean values using a data dictionary | **matchmaker** |
-| `which()` | apply logical criteria; return indices | **base** R |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| Function                                            | Utility                                                        | Package                   |
++=====================================================+================================================================+===========================+
+| `%>%`                                               | “pipe” (pass) data from one function to the next               | **magrittr**              |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `mutate()`                                          | create, transform, and re-define columns                       | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `select()`                                          | keep, remove, select, or re-name columns                       | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `rename()`                                          | rename columns                                                 | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `clean_names()`                                     | standardize the syntax of column names                         | **janitor**               |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `as.character()`, `as.numeric()`, `as.Date()`, etc. | convert the class of a column                                  | **base** R                |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `across()`                                          | transform multiple columns at one time                         | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| **tidyselect** functions                            | use logic to select columns                                    | **tidyselect**            |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `filter()`                                          | keep certain rows                                              | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `distinct()`                                        | de-duplicate rows                                              | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `rowwise()`                                         | operations by/within each row                                  | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `add_row()`                                         | add rows manually                                              | **tibble**                |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `arrange()`                                         | sort rows                                                      | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `recode()`                                          | re-code values in a column                                     | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `case_when()`                                       | re-code values in a column using more complex logical criteria | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `replace_na()`, `na_if()`, `coalesce()`             | special functions for re-coding                                | **tidyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `age_categories()`and `cut()`                       | create categorical groups from a numeric column                | **epikit** and **base** R |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `match_df()`                                        | re-code/clean values using a data dictionary                   | **matchmaker**            |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `which()`                                           | apply logical criteria; return indices                         | **base** R                |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
 
 ## Step 1: inspect the data
 
 ### Inspecting data helps identify potential problems before analysis and plan your data cleaning strategy by verifying:
 
--   Data imported correctly
+- Data imported correctly
 
--   Variable types are appropriate
+- Variable types are appropriate
 
--   Value formatting is consistent
+- Value formatting is consistent
 
--   Missing value patterns
+- Missing value patterns
 
--   Duplicate records
+- Duplicate records
 
--   Data set structure and dimensions
+- Data set structure and dimensions
 
--   **If column names are clean (concise, no spaces, no blanks, no dots, no caps)**
+- **If column names are clean (concise, no spaces, no blanks, no dots, no caps)**
+
+```{r}
+# Using head 
+head(linelist_raw)
+```
 
 ```{r}
 #from skimr package
 skim(cholera_linelist_raw)
 ```
 
+```{r}
+# from glimpse package
+glimpse(cholera_linelist_raw)
+```
+
+**Now let's check character strings to see if:**
+
+- Duplicate entries for the same value due to spelling errors
+
+- inconsistent capitalization
+
+- extra spaces
+
+- if there are more values what you were expecting
+
+```{r}
+# Let's inspect the State varaible
+cholera_linelist_raw count(State)
+```
+
+```{r}
+# Let's inspect the State varaible
+cholera_linelist_raw %>% count(source water)
+```
+
 ### what issues did you identify?
 
-## Step 2: 
++--------------------------------------------------------------------------------------+
+|                                                                                      |
++:=====================================================================================+
+| Column Names: Mixed naming conventions, caps, spaces, dots                           |
++--------------------------------------------------------------------------------------+
+| other dates are POSIXct but we can make them *Dates* for ease and consistency        |
++--------------------------------------------------------------------------------------+
+| State: some are misspelled                                                           |
++--------------------------------------------------------------------------------------+
+| age is shown as character value                                                      |
++--------------------------------------------------------------------------------------+
+| missing data in every symptom                                                        |
++--------------------------------------------------------------------------------------+
+| this code doe not work because there is a space in the variable name "source water"\ |
+| \                                                                                    |
+| cholera_linelist_raw %\>% count(source water)                                        |
++--------------------------------------------------------------------------------------+
+
+## Step 2: Clean data using Tiduverse
+
+Using **Tidyverse** packages, we build one single cleaning pipeline using the pipe operator (`%>%`). Each pipe passes the result of one step to the next.
+
+### 💡 **Pro Tip:**
+
+We assign the result to a **new** data frame (`cholera_linelist_clean`) using `<-` to preserve the original raw data — always protect your raw data!
+
+### We are going to do the following cleaning steps in one pipeline:
+
+#### 2a. Standardize Column Names
+
+`clean_names()` from **janitor** automatically converts all column names to `snake_case` (e.g., `date onset` → `date_onset`).
+
+### 2b — Convert Date Columns to Date Format
+
+`mutate()` + `as.Date()` converts "date onset" from POSIXct to an easier to use general date variable — required for any sorting, filtering, or date math.
+
+### 2c — Rename Columns
+
+`rename()` gives three columns clearer, more descriptive names:
+
+| Old Name       | New Name       |
+|----------------|----------------|
+| `date_onset`   | `onset_date`   |
+| `lat`          | `latitiude`    |
+| `lon`          | `longitutde`   |
+| `source_water` | `water_soruce` |
+
+### 2d — Standardize State Names
+
+`case_when()` + `str_detect()` inside `mutate()` maps inconsistent raw State values to clean standardized names in a new `state_name` column. First match wins; anything unrecognized is labeled `"Other/Unknown"`.
+
+We can use the code we ran previously as a reference to see what the correct spelling is:
+
+```{r}
+# Let's inspect the State varaible
+cholera_linelist_raw %>% count(State)
+```
+
+### 2e — Select and Order Final Variables
+
+`select()` keeps only the necessary variables and arranges them in a logical order for interpretation before exporting the finalized dataset. You can also drop specific variables using the `-` sign, for emaple `select(-state)` would drop the original state variable since we have created a new one with the correct names.
+
+### Start cleaning
+
+This code chunk contains the complete workflow for cleaning the dataset, and you can run all the code between the pipes `%>%`.
+
+```{r}
+
+cholera_linelist_clean <- cholera_linelist_raw %>%
+  # STEP 2a: Standardize all column names to snake_case (lowercase with underscores)
+  # Example: "Date Of Onset" becomes "date_of_onset"
+  clean_names() %>%
+
+  # STEP 2b: Convert date columns from character strings to proper R Date objects
+  # This is required before doing any date math or sorting by date
+  mutate( date_onset = as.Date(date_onset)) %>%
+  # STEP 2c: Rename columns to be more descriptive and consistent
+  # new name (left)  →  Old name (right)
+  # onset_date   →  date_onset
+  # latitude     →  lat
+  # longitutde   →  lon
+  # water_source → source_water
+  rename(
+    onset_date   = date_onset,
+    latitude     = lat,
+    longitutde   = lon,
+    water_source = source_water 
+  ) %>%
+   # STEP 2d: Standardize messy state name values into clean, consistent categories
+   # str_detect() looks for a keyword pattern inside the raw hospital column
+   # case_when() works like a series of if/else conditions — first match wins
+   # A new varaible with the correct names is added and called "state_name"
+    mutate(
+      state_name = case_when(
+        str_detect(state, "Blu|Blue") ~ "Blue Nile",
+        str_detect(state, "Ge|Gez")   ~ "Gezira",
+        str_detect(state, "Kas|Kass") ~ "Kassala",
+        str_detect(state, "Khar")     ~ "Khartoum",
+        str_detect(state, "North")    ~ "North Darfur",
+        str_detect(state, "Red")      ~ "Red Sea",
+        str_detect(state, "South")    ~ "South Darfur",
+        str_detect(state, "White")    ~ "White Nile",
+        is.na(state) | state == "" ~ "Other/Unknown",
+        TRUE                             ~ "Other/Unknown"  # catches anything else
+      )
+    ) %>%
+  # STEP 2e: Select only the variables we need for analysis and arrange them in
+  select(case_id, onset_date, state_name, everything(), -state)
+```
+
+### Step 3: Group exercise
+
+in groups of 4 or 5 do similar importing, inspecting, cleaning, and exporting for the dengue file in the raw_data fodler
+
+Use the file in the student code folder for exercise 1...

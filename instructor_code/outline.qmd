@@ -177,4 +177,4 @@ Example of what the data actually look like fo reach illness
 
 # Session 2 - Epidemiologic Measures, Tables, plots, & Maps
 
-# Session 3 -Outbreak Detection, Modeling, Forecasting, and Reporting
+# Session 3 - Outbreak Detection, Modeling, Forecasting, and Reporting

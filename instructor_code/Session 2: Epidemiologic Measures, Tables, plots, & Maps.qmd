@@ -13,10 +13,6 @@ Case control and cohort studies
 
 -   RR
 
--   SA
-
--   HR
-
 -   Attack rates
 
 Simple stats
