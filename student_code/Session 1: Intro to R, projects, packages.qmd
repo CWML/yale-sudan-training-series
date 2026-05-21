@@ -1,0 +1,83 @@
+---
+title: "Session 1: Intro to R, project management"
+format: html
+editor: visual
+---
+
+# Project Management
+
+## EXERCISE 1
+
+Create an R Environment
+
+1. Navigate to the CONSOLE tab (left side of the Panel)
+
+2. Type getwd() and press enter to check if you are in the directory you cloned (If not, navigate there.)
+
+3. Once you are in the directory you cloned, type renv::init(). This will check for any libraries you are missing and install them. It will also:
+
+- Create an renv/ folder
+
+- Create an renv.lock file
+
+- Create or update .gitignore to exclude the renv package cache
+
+- Snapshot any packages already detected in the project
+
+4. In the Console window, click the curved arrow icon to restart R
+
+5. If you want to capture your environment, enter "renv::snapshot()" to record the package versions in your environment.
+
+- If you get a message that says you are "in a project that hasn't been activated yet", choose option "1: Activate the project and use the project library" by entering "1" in the console.
+
+6. Notice these files in your project directory: 
+yale-sudan-training-series/ 
+├── .gitignore ← your root-level gitignore (from git init) 
+├── .Rprofile 
+├── renv.lock 
+└── renv/ 
+    └── .gitignore ← renv's gitignore, scoped only to the renv/ folder 
+    └── activate.R 
+    └── settings.json
+    └── library/ 
+
+
+- Now when this repository is cloned, renv::restore() will find the renv files you've created, and autoload the matching libraries.
+
+## EXERCISE 2
+
+Write a README file
+
+1. Confirm that you are in the root directory of your workshop folder - "getwd()"" in console to check
+
+2. In the console, enter: "fs::dir_tree()" - this calls the dir_tree function from the fs library - you should see an output that shows you all your project files and their relationships
+
+3. To write this output to a file, enter this command in the console: "capture.output(fs::dir_tree(), file = "README.txt")"
+
+4. Copy the text in the lines below (stop when you get to step 5) and paste at the top of your README.txt file (open in another window):
+
+This readme file was generated on [YYYY-MM-DD] by [NAME]
+
+GENERAL INFORMATION
+
+Title of Dataset:
+
+Author/Principal Investigator Information
+
+Name: ORCID: Institution: Address: Email:
+
+Date of data collection: provide single date, range, or approximate date; suggested format YYYY-MM-DD)
+
+Geographic location of data collection: provide latitude, longitude, or city/region, State, Country
+
+SHARING/ACCESS INFORMATION
+
+DATA & FILE OVERVIEW
+
+File List:
+
+This README template is a simplified version of Cornell's Readme Template for Data: 
+https://ecommons.cornell.edu/entities/publication/6effe964-798e-4c21-aac2-4194709ff230 
+
+5. Optional: in your README.txt file, write a short description next to these folders: - raw_data (original data goes here) - processed data (clean data goes here) - scripts (code to for analyses goes here) - outputs (analyses outputs go here)
+
