@@ -7,7 +7,7 @@ editor: visual
 
 # Overview
 
-qfqfqq
+In this session we will cover data improitng, cleaning, and validation using the Tidyverse using a cholera line-list dataset for Sudan. Once we have cleaned the data, we will export it to the "processed_data" folder. We will then do a group exercise where you will be doing the same thing with a dengue line-list dataset for Sudan.
 
 # Packages used for this session
 
@@ -71,6 +71,7 @@ pacman::p_load(
 ```{r}
 # if your .xlsx has multiple sheets:
 # my_data <- import(here("FOLDER NAME", "DATA_FILE.xlsx"), which = "SHEET_NAME")
+# packages used: rio, here, openxlsx
 
 cholera_linelist_raw <- import(here('raw_data', 'cholera_linelist_2025_sudan.xlsx'))
 ```
@@ -217,7 +218,7 @@ cholera_linelist_raw %>% count(source water)
 +--------------------------------------------------------------------------------------+
 | age is shown as character value                                                      |
 +--------------------------------------------------------------------------------------+
-| missing data in every symptom                                                        |
+| Every symptom has some missing data                                                  |
 +--------------------------------------------------------------------------------------+
 | this code doe not work because there is a space in the variable name "source water"\ |
 | \                                                                                    |
@@ -246,12 +247,12 @@ We assign the result to a **new** data frame (`cholera_linelist_clean`) using `<
 
 `rename()` gives three columns clearer, more descriptive names:
 
-| Old Name       | New Name       |
-|----------------|----------------|
-| `date_onset`   | `onset_date`   |
-| `lat`          | `latitiude`    |
-| `lon`          | `longitutde`   |
-| `source_water` | `water_soruce` |
+| Old Name       | New Name        |
+|----------------|-----------------|
+| `date_onset`   | `onset_date`    |
+| `lat`          | `latitiude`     |
+| `lon`          | `longitutde`    |
+| `source_water` | `water_sorucee` |
 
 ### 2d — Standardize State Names
 
@@ -264,7 +265,27 @@ We can use the code we ran previously as a reference to see what the correct spe
 cholera_linelist_raw %>% count(State)
 ```
 
-### 2e — Select and Order Final Variables
+### 2e — Handling missing values in the symptom variables
+
+For surveillance data we rarely delete records; instead we make missingness explicit so it is counted and reported.\
+In this project we recode every blank or `NA` symptom entry to the literal value **"Unknown"**.
+
+Why this approach?\
+• “Unknown” appears in tables and plots, reminding users that information was not recorded.\
+• Numeric columns stay unchanged, so analytical calculations (rates, medians, etc.) are unaffected.\
+• The pipeline is fully reproducible and works for any future dataset with the same structure.
+
+Steps implemented with the tidyverse:
+
+1.  `mutate()` updates the data frame in place. 
+
+2.  `across()` applies the same rule to all text variables. 
+
+3.  `where(is.character)` limits the change to character columns only. 
+
+4.  `trimws()` strips invisible spaces, `na_if()` turns empty strings into `NA`, and `replace_na()` converts those `NA` (plus any that were already present) to `"Unknown"`.
+
+### 2f — Select and Order Final Variables
 
 `select()` keeps only the necessary variables and arranges them in a logical order for interpretation before exporting the finalized dataset. You can also drop specific variables using the `-` sign, for emaple `select(-state)` would drop the original state variable since we have created a new one with the correct names.
 
@@ -273,6 +294,7 @@ cholera_linelist_raw %>% count(State)
 This code chunk contains the complete workflow for cleaning the dataset, and you can run all the code between the pipes `%>%`.
 
 ```{r}
+# packages used: janitor, dplyr, stringr, tidyr, tidyverse
 
 cholera_linelist_clean <- cholera_linelist_raw %>%
   # STEP 2a: Standardize all column names to snake_case (lowercase with underscores)
@@ -311,13 +333,46 @@ cholera_linelist_clean <- cholera_linelist_raw %>%
         is.na(state) | state == "" ~ "Other/Unknown",
         TRUE                             ~ "Other/Unknown"  # catches anything else
       )
-    ) %>%
-  # STEP 2e: Select only the variables we need for analysis and arrange them in
+    ) %>% 
+  # STEP 2e: Change blanks or NA values to "unknown" 
+  mutate(
+    across(
+      where(is.character),
+      ~ replace_na( na_if(trimws(.x), ""), "unknown" )
+    )
+  ) %>%
+  # STEP 2f: Select only the variables we need for analysis and arrange them in
   select(case_id, onset_date, state_name, everything(), -state)
+```
+
+### Reinspect your cleaned data
+
+```{r}
+# Let's inspect the state_name varaible
+cholera_linelist_clean %>% count(state_name)
+```
+
+```{r}
+# Using the skimr package to inspect the cleaned data
+skim(cholera_linelist_clean)
+```
+
+# Export data to the "processed_data" folder using Rio() and Here()
+
+In the same spirit that we *imported* raw files earlier (`rio::import(here("raw_data", …))`), we now *export* our cleaned line-list with two helper packages:
+
+• **`rio`** – wraps dozens of I/O functions behind a single verb, `export()`. The file type is inferred from the extension you give it (`.csv`, `.xlsx`, `.rds`, etc.).\
+• **`here`** – builds file paths that always start at the project root, so your code runs on any machine without fiddling with the working directory.
+
+```{r}
+# export the cleaned line-list to an Excel file in the "processed_data" folder
+# packages used: rio, here, openxlsx
+export(cholera_linelist_clean, here('processed_data', 'cholera_linelist_clean.xlsx'))
 ```
 
 ### Step 3: Group exercise
 
-in groups of 4 or 5 do similar importing, inspecting, cleaning, and exporting for the dengue file in the raw_data fodler
+#### In groups of 4 or 5 do similar importing, inspecting, cleaning, and exporting for the dengue file in the raw_data folder
 
-Use the file in the student code folder for exercise 1...
+- Navigate to the student_code folder and open *Session 1: Tidyverse, importing data, data cleaning and validation_exercise.qmd* and complete the exercise
+- You will be doing the same things we just covered on the *dengue_linelist_2025.xlsx* in the "raw_data" folder

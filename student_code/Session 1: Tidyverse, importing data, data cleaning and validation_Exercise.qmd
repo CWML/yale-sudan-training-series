@@ -1,0 +1,75 @@
+---
+title: "Session 1: Tidyverse, importing data, data cleaning and validation_Exercise"
+author: "Max Wegener"
+format: html
+editor: visual
+---
+
+# Exercise
+
+- Select one computer to perform the exercise
+
+- To show that you have completed the exercise, you group will share code in the file as well as the state_name counts output and the skim() output for the cleaned dataset.
+
+**HINT: Use the code shown during the instruction for eh cholera data as a guide, the coding and flow are pretty much identical**
+
+## Step 1: Importing Data
+
+Import *dengue_linelist_2025_sudan.xlsx* using the here() and rio() packages and call the object "dengue_linelist_raw"
+
+```{r}
+
+```
+
+## Step 2: Data Cleaning and Validation
+
+- Start by upodaitng the name of the DF to "dengue_linelist_clean*"*
+
+- Clean the column names
+
+- Convert date columns from POSIXct to an R Date
+
+- Rename columns to be more descriptive
+
+  | Old Name     | New Name      |
+  |--------------|---------------|
+  | `date_onset` | `onset_date`  |
+  | `lat`        | `latitiude`   |
+  | `lon`        | `longitutde`  |
+  | `days_hosp`  | hospital_days |
+
+- Standardize messy state name values into clean, consistent categories
+
+- Change blanks or NA values to "unknown"
+
+- Select only the variables we need for analysis and arrange them
+
+```{r}
+#add cleaning code chunk here
+
+
+```
+
+Here is where you will count the new state_name variable to ensure you address all the spelling mistakes
+
+```{r}
+# count state_name here
+# code from instruction: cholera_linelist_clean %>% count(state_name)
+
+```
+
+Here, you will use skim() to make sure all the NAs and blanks are addressed
+
+```{r}
+# use skim() to reinspect the cleaned data
+```
+
+## Step 3: Exporting Cleaned Data
+
+Using here() and rio(), export the cleaned dataset to the "processed_data" folder and call the new file "dengue_linelist_clean.xlsx"
+
+```{r}
+# export the cleaned line-list to an Excel file in the "processed_data" folder
+
+
+```
