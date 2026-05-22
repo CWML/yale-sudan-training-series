@@ -172,7 +172,7 @@ The **tidyverse** is a collection of R packages designed around shared princip
 
 ```{r}
 # Using head 
-head(linelist_raw)
+head(cholera_linelist_raw)
 ```
 
 ```{r}
@@ -258,11 +258,10 @@ We assign the result to a **new** data frame (`cholera_linelist_clean`) using `<
 
 Many surveillance variables are free-text. Typos, mixed capitals, or different languages make analysis impossible until they are harmonised. We tackle two of them:
 
-1. **State** – turn “Blue Nile”, “Blu Nile”, “blue_nile”… into a single value “Blue Nile”.
-2. **Sex** – collapse “M”, “Male ”, “male”, “F ”, “Female”, blanks, etc. into the tidy set of values (male, female, unknown).
+1.  **State** – turn “Blue Nile”, “Blu Nile”, “blue_nile”… into a single value “Blue Nile”.
+2.  **Sex** – collapse “M”, “Male ”, “male”, “F ”, “Female”, blanks, etc. into the tidy set of values (male, female, unknown).
 
-We use mutate() + case_when() (with stringr::str_detect() for pattern matching).
-The first matching rule wins; anything that matches nothing (including NA or empty strings) falls through to "unknown".
+We use mutate() + case_when() (with stringr::str_detect() for pattern matching). The first matching rule wins; anything that matches nothing (including NA or empty strings) falls through to "unknown".
 
 ```{r}
 # Let's inspect the State varaible
@@ -274,7 +273,35 @@ cholera_linelist_raw %>% count(State)
 cholera_linelist_raw %>% count(SEX)
 ```
 
-### 2e — Handling missing values in the symptom variables
+### 2e — Create Epidemiologically Meaningful Age Groups
+
+Age is numeric in the raw line list, but most descriptive analyses and visualisations of cholera data require age strata (e.g., to calculate age-specific attack rates or draw epidemic curves by age band).\
+In this step we transform the single “age” column into an ordered factor called **age_group** with six mutually exclusive categories:
+
+• 0–4 • 5–14 • 15–29 • 30–44 • 45–59 • 60 +
+
+Why group ages?
+
+• Interpretability – health audiences more easily grasp “cases among children 0–4 yrs” than a mean age of 6.3.\
+• Comparability – standard WHO/UNICEF age bands match other outbreak reports and surveillance systems.\
+• Stability – categorical rates are less sensitive to heaping or single-year mis-reporting.\
+• Privacy – grouping reduces the risk of identifying very old or very young individuals in small datasets.
+
+Implementation with the tidyverse:
+
+1.  `mutate()` adds a new variable without altering the raw `age`. 
+
+2.  `cut()` bins ages using explicit break points: `c(0, 5, 15, 30, 45, 60, Inf)`. 
+
+3.  `right = FALSE` produces half-open intervals `[a, b)` so age 5 falls in “5–14”, not “0–4”. 
+
+4.  `include.lowest = TRUE` ensures newborns (age 0) are included in the first band. 
+
+5.  Custom `labels = c("0–4", …, "60+")` give reader-friendly category names. 
+
+6.  Because `cut()` returns a factor ordered by the break sequence, plots and tables will display age groups in the correct epidemiological order without extra sorting code.
+
+### 2f — Handling missing values in the symptom variables
 
 For surveillance data we rarely delete records; instead we make missingness explicit so it is counted and reported.\
 In this project we recode every blank or `NA` symptom entry to the literal value **"Unknown"**.
@@ -294,7 +321,7 @@ Steps implemented with the tidyverse:
 
 4.  `trimws()` strips invisible spaces, `na_if()` turns empty strings into `NA`, and `replace_na()` converts those `NA` (plus any that were already present) to `"Unknown"`.
 
-### 2f — Select and Order Final Variables
+### 2g — Select and Order Final Variables
 
 `select()` keeps only the necessary variables and arranges them in a logical order for interpretation before exporting the finalized dataset. You can also drop specific variables using the `-` sign, for emaple `select(-state)` would drop the original state variable since we have created a new one with the correct names.
 
@@ -359,15 +386,27 @@ cholera_linelist_clean <- cholera_linelist_raw %>%
       TRUE                                                   ~ "unknown"
     )
   ) %>% 
-  # STEP 2e: Change blanks or NA values to "unknown" 
+  
+  # STEP 2e ── Derive ordered age-group factor ---------------------------
+  mutate(
+    age_group = cut(
+      age,
+      breaks = c(0, 5, 15, 30, 45, 60, Inf),   # interval end-points
+      right   = FALSE,                         # left-closed, right-open [a, b)
+      include.lowest = TRUE,
+      labels = c("0–4", "5–14", "15–29",
+                 "30–44", "45–59", "60+")
+    )
+  ) %>%
+  # STEP 2f: Change blanks or NA values to "unknown" 
   mutate(
     across(
       where(is.character),
       ~ replace_na( na_if(trimws(.x), ""), "unknown" )
     )
   ) %>%
-  # STEP 2f: Select only the variables we need for analysis and arrange them in
-  select(case_id, onset_date, state_name, everything(), -state)
+  # STEP 2g: Select only the variables we need for analysis and arrange them in
+  select(   case_id, onset_date, state_name, age_group, everything(), -state)
 ```
 
 ### Reinspect your cleaned data
