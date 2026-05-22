@@ -254,15 +254,24 @@ We assign the result to a **new** data frame (`cholera_linelist_clean`) using `<
 | `lon`          | `longitutde`    |
 | `source_water` | `water_sorucee` |
 
-### 2d — Standardize State Names
+### 2d — Standardise categorical text (“State” and “Sex”)
 
-`case_when()` + `str_detect()` inside `mutate()` maps inconsistent raw State values to clean standardized names in a new `state_name` column. First match wins; anything unrecognized is labeled `"Other/Unknown"`.
+Many surveillance variables are free-text. Typos, mixed capitals, or different languages make analysis impossible until they are harmonised. We tackle two of them:
 
-We can use the code we ran previously as a reference to see what the correct spelling is:
+1. **State** – turn “Blue Nile”, “Blu Nile”, “blue_nile”… into a single value “Blue Nile”.
+2. **Sex** – collapse “M”, “Male ”, “male”, “F ”, “Female”, blanks, etc. into the tidy set of values (male, female, unknown).
+
+We use mutate() + case_when() (with stringr::str_detect() for pattern matching).
+The first matching rule wins; anything that matches nothing (including NA or empty strings) falls through to "unknown".
 
 ```{r}
 # Let's inspect the State varaible
 cholera_linelist_raw %>% count(State)
+```
+
+```{r}
+# Let's inspect the State varaible
+cholera_linelist_raw %>% count(SEX)
 ```
 
 ### 2e — Handling missing values in the symptom variables
@@ -316,24 +325,40 @@ cholera_linelist_clean <- cholera_linelist_raw %>%
     longitutde   = lon,
     water_source = source_water 
   ) %>%
-   # STEP 2d: Standardize messy state name values into clean, consistent categories
-   # str_detect() looks for a keyword pattern inside the raw hospital column
-   # case_when() works like a series of if/else conditions — first match wins
-   # A new varaible with the correct names is added and called "state_name"
-    mutate(
-      state_name = case_when(
-        str_detect(state, "Blu|Blue") ~ "Blue Nile",
-        str_detect(state, "Ge|Gez")   ~ "Gezira",
-        str_detect(state, "Kas|Kass") ~ "Kassala",
-        str_detect(state, "Khar")     ~ "Khartoum",
-        str_detect(state, "North")    ~ "North Darfur",
-        str_detect(state, "Red")      ~ "Red Sea",
-        str_detect(state, "South")    ~ "South Darfur",
-        str_detect(state, "White")    ~ "White Nile",
-        is.na(state) | state == "" ~ "Other/Unknown",
-        TRUE                             ~ "Other/Unknown"  # catches anything else
-      )
-    ) %>% 
+  # STEP 2d: Standardise messy categorical text
+  # State  → new variable `state_name`
+  #     - str_detect() searches the raw `state` values for spelling fragments
+  #     - case_when() applies the first matching rule, else “Other/Unknown”
+  # Sex    → overwrites `sex`
+  #     - handles “M/m/Male/male…”, “F/f/Female/female…”, blanks, and NA
+  #     - maps everything to lowercase `male`, `female`, or `unknown`
+  #   str_detect() does the pattern matching;
+  #   case_when() chains the if/else logic (first match wins).
+ mutate(
+    # ----- State -------------------------------------------------------
+    state_name = case_when(
+      str_detect(state, regex("blu|blue",  ignore_case = TRUE)) ~ "Blue Nile",
+      str_detect(state, regex("gez",       ignore_case = TRUE)) ~ "Gezira",
+      str_detect(state, regex("kass",      ignore_case = TRUE)) ~ "Kassala",
+      str_detect(state, regex("^khar",     ignore_case = TRUE)) ~ "Khartoum",
+      str_detect(state, regex("north",     ignore_case = TRUE)) ~ "North Darfur",
+      str_detect(state, regex("red",       ignore_case = TRUE)) ~ "Red Sea",
+      str_detect(state, regex("south",     ignore_case = TRUE)) ~ "South Darfur",
+      str_detect(state, regex("white",     ignore_case = TRUE)) ~ "White Nile",
+      is.na(state) | str_trim(state) == ""                       ~ "Other/Unknown",
+      TRUE                                                       ~ "Other/Unknown"
+    ),
+    
+    # ----- Sex ---------------------------------------------------------
+    sex = case_when(
+      str_detect(sex, regex("^m$",      ignore_case = TRUE)) ~ "male",
+      str_detect(sex, regex("^male$",   ignore_case = TRUE)) ~ "male",
+      str_detect(sex, regex("^f$",      ignore_case = TRUE)) ~ "female",
+      str_detect(sex, regex("^female$", ignore_case = TRUE)) ~ "female",
+      is.na(sex) | str_trim(sex) == ""                       ~ "unknown",
+      TRUE                                                   ~ "unknown"
+    )
+  ) %>% 
   # STEP 2e: Change blanks or NA values to "unknown" 
   mutate(
     across(
@@ -350,6 +375,11 @@ cholera_linelist_clean <- cholera_linelist_raw %>%
 ```{r}
 # Let's inspect the state_name varaible
 cholera_linelist_clean %>% count(state_name)
+```
+
+```{r}
+# Let's inspect the sex varaible
+cholera_linelist_clean %>% count(sex)
 ```
 
 ```{r}

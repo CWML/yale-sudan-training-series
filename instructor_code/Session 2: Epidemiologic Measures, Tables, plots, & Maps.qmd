@@ -1,24 +1,112 @@
 ---
-title: "Session 2: Epidemiologic Measures, Tables, plots, & Maps"
+title: "Session 2: Epidemiologic Measures, Tables, Plots & Maps"
 author: "Max Wegener"
 format: html
 editor: visual
 ---
 
-Descriptive Tables
+# Overview  
 
-Case control and cohort studies
+This session extends the data-cleaning skills from Session 1 into basic outbreak epidemiology and spatial visualisation.  
+Skills you will practise:
 
--   OR
+| Aim | Tool / function |
+|-----|-----------------|
+| 1. Produce clean descriptive tables | **janitor::tabyl()**, **gtsummary**, **dplyr::count()** |
+| 2. Compute measures of association | 2×2 tables ➜ **epitools::oddsratio()** & **epiR::epi.2by2()** |
+| 3. Calculate attack rates | **dplyr** pipelines |
+| 4. Draw an epidemic curve | **ggplot2** |
+| 5. Map state-level incidence | **sf**, **ggplot2**, **scale_fill_viridis_c** |
 
--   RR
+All code is fully reproducible: press **Render** to rebuild the HTML after any change.
 
--   Attack rates
+# Packages used for this session
+```{r}
+pacman::p_load(
+  here,        # file paths
+  rio,         # import/export
+  tidyverse,   # core data wrangling + ggplot2
+  janitor,     # tabyl()
+  skimr,       # quick inspection
+  gtsummary,   # publication-ready tables
+  epitools,    # odds ratio
+  epiR,        # risk ratio, attack rate helpers
+  lubridate,   # date handling
+  sf,          # simple features for GIS
+  viridis,     # colour scales
+  gt,
+  janitor,
+  epitools
+)
+```
 
-Simple stats
+# Load the cleaned cholera line-list
 
-Epi curves
+```{r}
+cholera_linelist <- import(here("processed_data", "cholera_linelist_clean.xlsx"))
+```
 
-GIS mapping using R
+# Descriptive tables
 
--   Shape files
+## Simple frequency table
+
+```{r}
+cholera_linelist %>% 
+  tabyl(state_name, show_missing_levels = TRUE) %>% 
+  adorn_pct_formatting()
+```
+
+```{r}
+cholera_linelist %>% 
+  tabyl(sex, outcome)
+```
+
+```{r}
+cholera_linelist %>% 
+  tabyl(sex, outcome) %>% 
+        adorn_totals("row") %>%        # optional Total row
+        adorn_percentages("row") %>% 
+        adorn_pct_formatting(digits = 1) %>% 
+        adorn_ns(position = "front") 
+```
+
+# Simple statistical tests
+
+## t-test
+
+## Chi-squared test
+
+## Summary statistics
+
+## odds ratio
+
+## risk ratio
+
+## attack rate
+
+# Epidemic Curves
+
+# Maps
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Measures of association
+
+Assume we want to know whether drinking surface water (vs. other sources) is associated with death.
+
+```{r}
+
+```
