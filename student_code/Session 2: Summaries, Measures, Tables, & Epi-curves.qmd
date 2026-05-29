@@ -1,0 +1,185 @@
+---
+title: "Session 2: Summaries, Measures, Tables, & Epi-curves_Exercise"
+author: "Max Wegener"
+format: html
+editor: visual
+---
+
+# Load packages
+
+```{r}
+pacman::p_load(
+  here,
+  rio,
+  tidyverse,
+  janitor,
+  gtsummary,
+  rstatix
+)
+```
+
+# Exercise
+
+- Select one computer to perform the exercise.
+
+- To show that you have completed the exercise, your group will share your code (with demonstration to see console), the final publication-ready "Table 1" output, and your facetted epidemic curve plot.
+
+**HINT: Use the code shown during the instruction for the cholera data as a guide. The coding pipeline and logic are identical—you just need to apply them to the Dengue dataset!**
+
+------------------------------------------------------------------------
+
+## Step 1: Load the Cleaned Data
+
+Import the cleaned Dengue dataset you exported during Session 1 (*dengue_linelist_clean.xlsx*) from the `processed_data` folder using `here()` and `rio()`. Call the object `dengue_linelist`. Ensure you explicitly verify or coerce the `onset_date` column to an R Date format.
+
+```{r}
+# Import cleaned dengue line-list and verify the onset_date format
+
+dengue_linelist <- import(here("processed_data", "dengue_linelist_clean.xlsx")) %>%
+  mutate(onset_date = as.Date(onset_date))
+```
+
+## Step 2: Descriptive Frequency Tables
+
+Using the {janitor} package, generate descriptive tables to understand your study population. Create a simple frequency table showing the distribution of cases across different state_name values, including formatted percentages.
+
+```{r}
+# 1. Simple frequency table for state_names
+# HINT: See Simple frequency table on instructor file
+
+
+```
+
+Create a two-way cross-tabulation looking at sex against clinical outcome. Adorn the table to show row totals and row percentages front-facing (N (Pct%)).
+
+```{r}
+# 2. Adorned two-way table for sex vs. outcome
+# HINT: see Advanced multi-adorned table on instructor file
+
+
+```
+
+## Step 3: Summary Statistics & Simple Hypothesis Testing
+
+We want to evaluate the demographic profile of our cases.
+
+- Use {rstatix} to calculate the overall summary statistics for age.
+- Perform a statistical hypothesis test to determine if the continuous variable age differs significantly across different clinical outcome groups (e.g., recovered vs. death vs. hospitalised).
+
+**Hint: Check the distribution of age first to decide if you should use a parametric (ANOVA) or non-parametric (Kruskal-Wallis) approach!**
+
+```{r}
+#HINT: see Overall summary stats for age on instructor file
+
+
+```
+
+For this let's compare the age distribution of dengue cases between different outcomes
+
+```{r}
+# Run the appropriate hypothesis test for age across outcome groups
+
+# HINT: Use non-parametric test used to compare a contiuous varaible to a variable with more than two values
+
+
+
+```
+
+## Step 4: Constructing a Publication-Ready "Table 1"
+
+Using the {gtsummary} package, assemble a comprehensive baseline characteristics table (tbl_summary) stratified by outcome.
+
+- Include age, sex, state name, and key symptoms (like fever or joint pain).
+- Add an overall sample size column (add_n()).
+- Add p-values (add_p()) using appropriate tests for continuous and categorical variables.
+- Bold the labels and add a professional spanning header called "Clinical Outcome".
+
+**Hint: Find the following numbers in the code chunk and replace with the appropriate words. See instructor code.**
+
+Any number within quotations or asterisks (\*) the appropriate names/labels should be between them as well
+
+1.  Dataframe name
+2.  Variable name
+3.  test name
+4.  test name
+5.  Lable name for spanning header
+6.  Lable name for header
+
+```{r}
+
+table_one <- 1 %>% 
+  select(outcome, age, sex, state_name, serotype, fever, severity, retroorbital_pain) %>% 
+  mutate(across(c(sex, state_name, fever, retroorbital_pain), as.factor)) %>% 
+  tbl_summary(
+    by = 2,
+    statistic = list(
+      all_continuous() ~ "{median} ({p25}, {p75})",
+      all_categorical() ~ "{n} ({p}%)"
+    ),
+    missing = "no"
+  ) %>% 
+  add_n() %>% 
+  add_p(
+    test = list(
+      all_categorical() ~ "3", 
+      all_continuous() ~ "4"
+    )
+  ) %>% 
+  bold_labels() %>% 
+  modify_spanning_header(all_stat_cols() ~ "** 5 **") %>% 
+  modify_header(label = "** 6 **")
+
+table_one
+```
+
+## Step 5: Draw a Facetted Epidemic Curve
+
+Using ggplot2, build an epidemic curve to visualize the temporal progression of the Dengue outbreak. Map onset_date to the X-axis using geom_histogram().
+
+- Group the cases into 7-day epidemiological weeks by adjusting the binwidth.
+- Color the bars dynamically by setting the fill parameter to track case counts by water_source or outcome.
+- Use facet_wrap() to split the epidemic curves into parallel timelines for each individual state_name.
+- Clean up the presentation with theme_minimal() and add descriptive titles and axis labels.
+
+**Hint: Find the following numbers in the code chunk and replace with the appropriate words. See instructor code.**
+
+Any number within quotations, the appropriate names/labels should be between the quotations
+
+1.  dataframe name
+2.  the data for the x-axis
+3.  stratifying variable
+4.  x-axis label
+5.  y-axis label
+6.  fill label
+
+Notice that "binwidth" has a question (?) - replace with the number of days the bin should be
+
+**Hint: Again, see instructor file**
+
+```{r}
+# Create your facetted weekly epi-curve here
+# Create your facetted weekly epi-curve here
+ggplot(data = 1, mapping = aes(x = 2, fill = 3)) +
+  geom_histogram(
+    binwidth = ? ,             # Groups dates into 7-day epi-weeks
+    position = "stack",       # Stacks outcomes on top of each other
+    color = "white",          # Adds clean borders between bars
+    linewidth = 0.2
+  ) +
+  scale_fill_brewer(palette = "Dark2") +
+  #scale_fill_viridis_d(option = "rocket") +
+  #scale_fill_viridis_d(option = "plasma") +
+  facet_wrap(~ state_name, scales = "free_y") + # Allows y-axes to scale to individual state sizing
+  theme_minimal() +
+  labs(
+    title = "Weekly Incidence of Dengue Cases across Sudan States (2025)",
+    subtitle = "Aggregated by 7-day epidemiological windows",
+    x = "4",
+    y = "5",
+    fill = "6"
+  ) +
+  theme(
+    strip.text = element_text(face = "bold"), # Bolds the facet state names
+    legend.position = "bottom"
+  )
+```

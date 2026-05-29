@@ -1,0 +1,454 @@
+---
+title: "Session 2: Summaries, Measures, Tables, & Epi-curves"
+author: "Max Wegener"
+format: html
+editor: visual
+---
+
+# Overview
+
+This session extends the data-cleaning skills from Session 1 into basic outbreak epidemiology and spatial visualisation.\
+Skills you will practice:
+
+| Aim | Tool / function |
+|--------------------------|----------------------------------------------|
+| 1\. Produce clean descriptive tables | **janitor::tabyl()**, **gtsummary**, **dplyr::count()** |
+| 2\. Compute measures of association | 2×2 tables ➜ **epitools::oddsratio()** & **epiR::epi.2by2()** |
+| 3\. Calculate attack rates | **dplyr** pipelines |
+| 4\. Draw an epidemic curve | **ggplot2** |
+
+# Packages used for this session
+
+```{r}
+pacman::p_load(
+  here,
+  rio,
+  tidyverse,
+  janitor,
+  skimr,
+  gtsummary,
+  epitools,
+  epiR,
+  lubridate,
+  sf,
+  viridis,
+  gt,
+  rstatix,
+  aweek,
+  incidence2,
+  i2extras,
+  stringr,
+  forcats,
+  RColorBrewer
+)
+```
+
+# Load exercise data
+
+We will load the cleaned cholera line-list that we created in Session 1, as well as a dataset of controls that we will use for calculating attack rates and measures of association. We will then combine the cases and controls into a single dataset for analysis.
+
+Purpose: import cleaned cholera line-list & coerce onset_date to Date When importing spreadsheets from Excel via rio::import(), date columns can occasionally revert to raw character strings or numeric Excel serial timestamps. We explicitly wrap as.Date() inside a mutate() statement to protect downstream time-series operations like epi-curves.
+
+**Purpose: import cleaned cholera line-list & coerce onset_date to Date**
+
+```{r}
+# Packages: rio::import(), dplyr::mutate()
+cholera_linelist <- import(here("processed_data", "cholera_linelist_clean.xlsx")) %>%
+  mutate(onset_date = as.Date(onset_date))
+```
+
+**Purpose: import control patients line-list**
+
+To calculate relative risks, odds ratios, or conditional attack rates, we require a comparison cohort. This file contains a sample of un-exposed or unaffected controls collected from the community during the investigation.
+
+```{r}
+# Packages: rio::import()
+cholera_controls <- import(here("processed_data", "cholera_controls.xlsx"))
+```
+
+**Purpose: combine cases + controls; create case_status flag**
+
+There are different ways to combine datasets. You can use join logic (left_join, right_join, inner_join) if you have distinct datasets with different variables that must match on a unique record key (like a patient ID).
+
+Another way is to stack datasets using bind_rows(). Stacking is used when two completely independent dataframes share identical column names and structures, allowing us to append rows directly underneath each other.
+
+Because our cases and controls are structurally identical, we stack them and use tidyr::coalesce() to fill missing case flags as explicit "case" records.
+
+```{r}
+# Packages: dplyr::bind_rows(), dplyr::mutate(), tidyr::coalesce()
+cholera_cases_controls <- bind_rows(cholera_linelist, cholera_controls) %>% 
+  mutate(case_status = coalesce(case_status, "case"))
+```
+
+# Descriptive tables for categorical variables using the tbyl within the janitor package
+
+Descriptive tables are the absolute baseline of field epidemiology. Before jumping to advanced models, you must understand the distribution of counts, missing values, and percentages across demographic parameters like sex, state, and outcome. While standard base::table() works, the {janitor} package provides tabyl(), which outputs clean, tidy dataframes that can accept custom formatting modifiers.
+
+## Simple frequency table
+
+A simple single-variable frequency sweep allows us to identify case distributions by geographical area and flag structural formatting errors or empty levels.
+
+```{r}
+# Packages: janitor::tabyl(), janitor::adorn_pct_formatting()
+cholera_linelist %>% 
+  tabyl(state_name, show_missing_levels = TRUE) %>% 
+  adorn_pct_formatting()
+```
+
+## Two-way cross-tabulation
+
+Cross-tabulations evaluate the raw intersections of two categorical parameters (e.g., checking outcomes stratified by sex).
+
+```{r}
+cholera_linelist %>% 
+  tabyl(sex, outcome)
+```
+
+## Advanced multi-adorned table
+
+By chaining adorn\_ functions, we can format a raw table into a highly legible, professional descriptive summary featuring nested row percentages alongside raw frequencies.
+
+```{r}
+cholera_linelist %>% 
+  tabyl(sex, outcome) %>% 
+        adorn_totals("row") %>%        # optional Total row
+        adorn_percentages("row") %>% 
+        adorn_pct_formatting(digits = 1) %>% 
+        adorn_ns(position = "front")
+```
+
+# Summary statistics fior numeric variables using get_summary_stats within the statix package
+
+Continuous variables (like age) cannot be neatly described using simple frequency tabulations. Instead, we use central tendency metrics (means, medians) and parameters of dispersion (standard deviations, Interquartile Ranges \[IQR\]) to identify demographic shifting. We use rstatix::get_summary_stats() because it integrates beautifully with piped data workflows.
+
+## Overall summary statistics for age
+
+```{r}
+cholera_linelist %>%
+  get_summary_stats(age, type = "common")
+```
+
+## Summary statistics using one grouping variable
+
+In an active epidemic, evaluating whether severe clinical outcomes skew towards specific age thresholds is vital. Here, we group by case outcome to check if older populations face distinct risk profiles.
+
+```{r}
+cholera_linelist %>% 
+  group_by(outcome) %>% 
+  get_summary_stats(age, type = "common")# Measures of association 
+```
+
+## Summary statistics using more than one grouping variable
+
+By adding nested grouping fields, you can review finer strata within the data—such as monitoring whether age trends vary when interacting with both biological sex and clinical outcome.
+
+```{r}
+cholera_linelist %>% 
+  group_by(sex, outcome) %>% 
+  get_summary_stats(age, type = "common")# Measures of association 
+```
+
+# Simple statistical tests
+
+To determine if variations between patient groups represent random noise or statistically significant signals, we employ classical statistical hypothesis testing.
+
+## Parametric Comparisons: 
+
+### Student's t-test
+
+A t-test compares the means of a continuous variable between exactly two independent groups. This test assumes that the underlying continuous metric follows a roughly normal distribution. Here, we evaluate whether the mean age differs significantly between male and female cholera cases.
+
+```{r}
+t.test(age ~ sex, data = cholera_linelist)
+```
+
+**Formatted reporting table using {gtsummary}**
+
+Rather than copy-pasting raw text outputs from the console, {gtsummary} automatically extracts the underlying statistical arrays and builds an elegant summary table including the calculated p-value.
+
+```{r}
+cholera_linelist %>% 
+  select(age, sex) %>%             # keep variables of interest
+  tbl_summary(                               # produce summary table
+    statistic = age ~ "{mean} ({sd})", # specify what statistics to show
+    by = sex) %>%                        # specify the grouping variable
+  add_p(age ~ "t.test") 
+```
+
+### Analysis of Variance (ANOVA)
+
+An ANOVA test expands on the t-test by comparing the means of a continuous variable across three or more independent groups (e.g., comparing mean age profiles across Recovered vs. Died vs. Hospitalised cohorts).
+
+```{r}
+library(rstatix)
+
+cholera_linelist %>% anova_test(age ~ outcome)
+```
+
+**Formatted ANOVA summary table via {gtsummary}**
+
+```{r}
+library(gtsummary)
+library(dplyr) # Explicitly using dplyr for data manipulation
+
+cholera_linelist %>%
+  select(age, outcome) %>%
+  tbl_summary(
+    by = outcome,
+    statistic = list(age ~ "{mean} ({sd})") # Wrapped in list() for safety
+  ) %>%
+  add_p(test = all_continuous() ~ "oneway.test") # Uses base R's robust one-way ANOVA
+```
+
+## Non-Parametric Comparisons
+
+### Chi-squared test
+
+Chi-squared tests are used to compare the distribution of a categorical variable between two or more groups.
+
+**Non-Parametric Comparisons: Deviations from Normality**
+
+When a continuous variable is highly skewed, highly irregular, or contains extreme outliers, parametric assumptions fail. In these situations, we switch to non-parametric rank-based tests which compare medians and distributions rather than means.
+
+### **Two-Group Non-Parametric Comparison: Wilcoxon Rank-Sum / Mann-Whitney U**
+
+The Wilcoxon rank-sum test assesses whether the distributions of a continuous variable differ significantly between two categorical groups without assuming a bell-curve distribution.
+
+```{r}
+# calcaulte a wilcoxon rank sum test for age and sex
+wilcox.test(age ~ sex, data = cholera_linelist)
+```
+
+**Formatted Wilcoxon summary table via {gtsummary}**
+
+Notice that for non-parametric data, we alter our reporting metrics from mean (sd) to median (IQR) to accurately represent the data's central tendency.
+
+```{r}
+cholera_linelist %>% 
+  select(age, sex) %>%                       # keep variables of interest
+  tbl_summary(                                         # produce summary table
+    statistic = age ~ "{median} ({p25}, {p75})", # specify what statistic to show (this is default so could remove)
+    by = sex) %>%                                  # specify the grouping variable
+  add_p(age ~ "wilcox.test")  
+```
+
+### **Multi-Group Non-Parametric Comparison: Kruskal-Wallis Test**
+
+The Kruskal-Wallis test is a non-parametric test used to compare the distributions of a continuous variable between a categorical variable with more than two groups when the data is not normally distributed.
+
+In this case, we will compare the age distribution of cholera cases between different outcomes (e.g., recovered, died, hospitalised).
+
+```{r}
+kruskal.test(age ~ outcome, data = cholera_linelist)
+```
+
+**Formatted Kruskal-Wallis summary table via {gtsummary}**
+
+```{r}
+cholera_linelist %>% 
+  select(age, outcome) %>%                       # keep variables of interest
+  tbl_summary(                                         # produce summary table
+    statistic = age ~ "{median} ({p25}, {p75})", # specify what statistic to show (this is default so could remove)
+    by = outcome) %>%                                  # specify the grouping variable
+  add_p(age ~ "kruskal.test")    # ≥2-group non-parametric test
+```
+
+### **Categorical Association: Pearson χ² Test of Independence**
+
+The Pearson χ² test evaluates whether the distribution of one categorical variable differs across the levels of another categorical variable.
+
+Here we test whether patient sex is independent of clinical outcome (three levels: recovered, death, hospitalised).
+
+```{r}
+chisq.test(
+  x = cholera_linelist$sex,
+  y = cholera_linelist$outcome
+)
+```
+
+**Formatted χ² summary table via {gtsummary}**
+
+```{r}
+# Packages: gtsummary::tbl_cross(), gtsummary::add_p()
+
+cholera_linelist %>% 
+  tbl_cross(
+    row = sex,
+    col = outcome,
+    percent = "row"          # show row-wise %
+  ) %>% 
+  add_p(test = "chisq.test") %>% 
+  bold_labels()
+```
+
+## Table 1: Comprehensive Baseline Characteristics Table
+
+In epidemiological publications and outbreak reports, "Table 1" is the standard layout used to summarize all recorded demographic, spatial, and clinical variables within a single comprehensive table, stratified by a key variable like clinical outcome.
+
+The code block below automatically detects variable formats, assigns appropriate parametric or non-parametric tests based on data types, computes the statistical differences, and applies clean bold label layouts.
+
+```{r}
+# ── packages ─────────────────────────────────────────────
+# dplyr, gtsummary, gt          
+# gt comes with {gtsummary} for pretty output
+
+# ── designate variable types ─────────────────────────────
+# Define input vectors based on measurement scale
+cont_vars <- c("age")
+
+cat_vars  <- c(
+  "age_group", "state_name", "sex", "dehydration", "treatment", "water_source",
+  "watery_diarrhea", "vomiting", "leg_cramps",
+  "dehydration_signs", "fever"
+)
+
+# ── build Table 1: stratify by outcome (recovered vs death) ─────────────
+tbl1 <- cholera_linelist %>% 
+  select(outcome, all_of(cont_vars), all_of(cat_vars)) %>% 
+  mutate(
+    across(all_of(cat_vars), as.factor),     # be sure categoricals are factors
+    outcome = factor(outcome,
+                     levels = c("recovered", "death", "hospitalised"))   # set column order
+  ) %>% 
+  tbl_summary(
+    by        = outcome,
+    type      = list(all_of(cont_vars) ~ "continuous"),
+    statistic = list(
+                 all_continuous()  ~ "{mean} ± {sd}",     # change to median/IQR if desired
+                 all_categorical() ~ "{n} ({p}%)"
+               ),
+    missing   = "no"                                     # omit explicit missing rows
+  ) %>% 
+  add_n()                             %>%  # overall N per column
+add_p(
+  test = list(
+    all_categorical() ~ "chisq.test.no.correct",
+    all_continuous()  ~ "aov"
+  )
+)%>% 
+  bold_labels()                      %>%  # bold variable names
+  modify_spanning_header(all_stat_cols() ~ "**Outcome**") %>%
+  modify_header(label = "**Variable**")   %>%
+  modify_footnote(
+    p = "Categorical: χ² test; Continuous: two-sample t-test."
+  )
+
+# ── display in notebook / Jupyter / Quarto ───────────────
+tbl1
+```
+
+## Attack Rates
+
+An Attack Rate is a crucial measure of speed and risk during an active outbreak. It is defined as the proportion of an at-risk population that contracts the target condition during a specified window.
+
+$$\text{Attack Rate}_{\text{exposed}}
+  \;=\;
+  \frac{\text{Number of new cases among persons with the exposure}}
+       {\text{Total number of persons with that exposure at risk at period start}}
+  \times 100\%
+  $$
+
+**Critical Methodological Caveats Denominators are Essential: To compute a true, valid attack rate, you need an accurate population denominator.** If your denominator is inaccurate, your resulting risk evaluations will be flawed.
+
+Classroom Assumption: For this illustrative exercise, we lack census data for every community water source. We will temporarily assume that the sum of all cases and controls captured within our dataset represents our total population at risk. While not true in a real-world setting, this allows us to practice the pipeline logic.
+
+```{r}
+# ── packages ─────────────────────────────────────────────
+# dplyr, ggplot2, scales
+
+# Tabulating conditional attack rates based on water exposure records
+# 1–3. Table of attack rates by water source
+attack_state_water <- cholera_cases_controls %>% 
+  mutate(is_case = case_status == "case") %>% 
+  group_by(water_source) %>% 
+  summarise(
+    cases       = sum(is_case),
+    total       = n(),
+    attack_rate = cases / total,
+    .groups     = "drop"
+  )
+
+attack_state_water
+```
+
+# Epidemic Curves
+
+An Epidemic Curve (Epi-curve) is a visual histogram of an outbreak that plots the number of emergent cases along the Y-axis against their specific date of symptom onset along the X-axis.
+
+An epi-curve provides essential visual clues about the outbreak's magnitude, its outliers, its time trends, and its primary mode of transmission:
+
+- Point Source: A sharp, rapid peak that tapers off quickly, indicating everyone was exposed to the same source at the same time (e.g., a contaminated shared meal).
+- Common Continuous Source: A prolonged plateau, indicating individuals have ongoing exposure to a single source that remains contaminated.
+- Propagated: A series of progressively larger peaks spaced roughly one incubation period apart, indicating person-to-person spread.
+
+## Basic Data Visualization: Understanding Age Distribution
+
+Before plotting dates, we can review the structural distribution of a continuous variable like age using a standard histogram. This helps us quickly spot population skew or unexpected outliers.
+
+```{r}
+ggplot(data = cholera_linelist, mapping = aes(x = age)) +
+geom_histogram()
+```
+
+## Basic Epidemic Curve (Daily Intervals)
+
+By mapping onset_date to the X-axis, we construct our first true epidemic curve.
+
+```{r}
+ggplot(data = cholera_linelist, mapping = aes(x = onset_date)) +
+  geom_histogram(binwidth = 1, fill = "darkred", color = "black") +
+  theme_minimal() +
+  labs(title = "Epidemic Curve of Cholera Outbreak", x = "Date of Symptom Onset", y = "Daily Case Incidences")
+```
+
+## Stratified Epidemic Curve (Weekly Aggregations)
+
+When dealing with extended or fluctuating outbreaks, daily blocks can create visual noise. Setting binwidth = 7 pools records into standard 7-day epidemiological blocks. Adding a fill parameter lets us track geographic propagation over time.
+
+```{r}
+ggplot(data = cholera_linelist, mapping = aes(x = onset_date, fill = state_name)) +
+  geom_histogram(binwidth = 7, position = "stack", color = "white", linewidth = 0.2) +
+  scale_fill_viridis_d(option = "plasma") +
+  #scale_fill_brewer(palette = "Dark2") +
+  #scale_fill_viridis_d(option = "rocket") +
+  labs(title = "Weekly Cholera Cases Stratified by State", x = "Date of Symptom Onset (7-day Bins)", y = "Number of Cases", fill = "State") +
+  theme_minimal()
+```
+
+## Facetted & Segmented Outbreak Overviews
+
+To investigate potential transmission vectors, we can split our visualization using facet_wrap(). This creates separate, parallel timelines for each geographic state, allowing us to compare patterns across different exposure groups.
+
+```{r}
+ggplot(data = cholera_linelist, mapping = aes(x = onset_date, fill = water_source)) +
+  geom_histogram(binwidth = 7, position = "stack", color = "white", linewidth = 0.1) +
+  scale_fill_viridis_d(option = "plasma") +  
+  #scale_fill_brewer(palette = "Dark2") +
+  #scale_fill_viridis_d(option = "rocket") +
+  labs(title = "Cholera Progression by Water Source across Reporting States", x = "Date of Symptom Onset", y = "Case Counts", fill = "Water Source") +
+  theme_minimal() +
+  facet_wrap(~ state_name, scales = "free_y") # 'free_y' adjusts individual panel heights for regional variations
+```
+
+## Localised Deep Dive: Focus on Red Sea State
+
+We can filter our data frame directly within the ggplot() call. This allows us to isolate and study the dynamics of a specific high-incidence region, such as Red Sea State, without altering our master dataset.
+
+```{r}
+ggplot(data = cholera_linelist %>% filter(state_name == "Red Sea"), mapping = aes(x = onset_date, fill = outcome)) +
+  geom_histogram(binwidth = 7, position = "stack", color = "white") +
+  scale_fill_brewer(palette = "Dark2") +
+  #scale_fill_viridis_d(option = "rocket") +
+  labs(title = "Outbreak Profile and Clinical Outcomes within Red Sea State", x = "Date of Symptom Onset", y = "Case Count", fill = "Patient Outcome") +
+  theme_minimal()
+```
+
+# Group Exercise
+
+Time allowed: 45 minutes
+
+Working in your assigned groups of 4 or 5, you will apply the analytical principles practiced above to a different epidemiological dataset: dengue_linelist_2025_sudan.xlsx.
+
+Your Objectives: - **Data Import & Prep:** Open your group workspace folder, locate the spreadsheet inside processed_data, and verify that the symptom onset date variable is explicitly parsed as a Date object. - **Descriptive Tables:** Generate a frequency table of dengue cases by state. Create a 2-way table looking at patient sex against clinical outcomes. - **Statistical Testing:** Investigate whether there is a significant difference in age between dengue cases who recovered versus those who were hospitalised or died. Pick the correct parametric or non-parametric test based on the age distribution. - **Table 1 Production:** Use {gtsummary} to assemble a formatted baseline characteristics table stratified by patient state. - **Epidemic Curve Construction:** Generate an elegant, weekly aggregated epidemic curve for dengue. Stratify or facet your visualization by state to see if you can spot signs of vector-borne propagation.
+
+Navigate to your group's folder, open student_code / Session 2: Summaries, Measures, Tables, & Epi-curves.qmd, and complete the exercises. Be ready to share your code and data visualizations with the class during the wrap-up discussion!

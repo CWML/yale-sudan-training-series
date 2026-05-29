@@ -1,0 +1,16 @@
+Session 3 - Outbreak Detection, Modeling, Forecasting, and Reporting
+
+
+
+
+# logistic regression
+## Logistic regression
+
+Since most of our variables are categorical, we can use logistic regression to look at the association between them. For example, we can look at the association between sex and outcome.
+
+
+If we had a dataframe that was mostly numeric, we could use correlation to look at the association between variables. For example, if we had a dataframe with age and time to recovery, we could look at the correlation between these two variables.
+
+# Measures of association
+
+Assume we want to know whether drinking surface water (vs. other sources) is associated with death.

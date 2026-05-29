@@ -197,7 +197,7 @@ glimpse(cholera_linelist_raw)
 
 ```{r}
 # Let's inspect the State varaible
-cholera_linelist_raw count(State)
+cholera_linelist_raw %>% count(State)
 ```
 
 ```{r}
@@ -339,7 +339,7 @@ cholera_linelist_clean <- cholera_linelist_raw %>%
 
   # STEP 2b: Convert date columns from character strings to proper R Date objects
   # This is required before doing any date math or sorting by date
-  mutate( date_onset = as.Date(date_onset)) %>%
+  mutate(date_onset = as.Date(date_onset)) %>%
   # STEP 2c: Rename columns to be more descriptive and consistent
   # new name (left)  →  Old name (right)
   # onset_date   →  date_onset
@@ -406,7 +406,7 @@ cholera_linelist_clean <- cholera_linelist_raw %>%
     )
   ) %>%
   # STEP 2g: Select only the variables we need for analysis and arrange them in
-  select(   case_id, onset_date, state_name, age_group, everything(), -state)
+  select(case_id, onset_date, state_name, age_group, everything(), -state)
 ```
 
 ### Reinspect your cleaned data
