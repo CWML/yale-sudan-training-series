@@ -13,14 +13,19 @@ In this session we will cover data improitng, cleaning, and validation using the
 
 ```{r}
 pacman::p_load(
-  rio,        # importing data  
-  here,       # relative file pathways  
-  janitor,    # data cleaning and tables
-  lubridate,  # working with dates
-  matchmaker, # dictionary-based cleaning
-  epikit,     # age_categories() function
-  tidyverse,  # data management and visualization
-  skimr
+  # ── Core Infrastructure & Data I/O ─────────────────────────────────────────
+  here,         # Relative file pathways to prevent broken working directory links
+  rio,          # Swiss-Army knife for importing/exporting data (xlsx, csv, rds)
+  tidyverse,    # Core ecosystem (ggplot2, dplyr, tidyr) for data science & viz
+
+  # ── Data Cleaning & Standardisation ────────────────────────────────────────
+  janitor,      # Clean column names, find duplicates, and build quick tabyls
+  lubridate,    # Parsing and executing calculations on epidemic date vectors
+  matchmaker,   # Dictionary-based string cleaning and surveillance recoding
+
+# ── Field Epidemiology & Summaries ─────────────────────────────────────────
+  epikit,       # Inline tracking functions and quick age_categories() generation
+  skimr         # Fast, summary summaries of missingness and data distributions
 )
 ```
 
@@ -349,7 +354,7 @@ cholera_linelist_clean <- cholera_linelist_raw %>%
   rename(
     onset_date   = date_onset,
     latitude     = lat,
-    longitutde   = lon,
+    longitude   = lon,
     water_source = source_water 
   ) %>%
   # STEP 2d: Standardise messy categorical text

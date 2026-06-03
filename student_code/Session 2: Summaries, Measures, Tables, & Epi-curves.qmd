@@ -132,54 +132,84 @@ table_one <- 1 %>%
 table_one
 ```
 
-## Step 5: Draw a Facetted Epidemic Curve
+# Step 6: Case Fatality Risk / Ratio (CFR)
 
-Using ggplot2, build an epidemic curve to visualize the temporal progression of the Dengue outbreak. Map onset_date to the X-axis using geom_histogram().
+Calculate the clinical severity of this outbreak using your case-only surveillance data.
 
-- Group the cases into 7-day epidemiological weeks by adjusting the binwidth.
-- Color the bars dynamically by setting the fill parameter to track case counts by water_source or outcome.
-- Use facet_wrap() to split the epidemic curves into parallel timelines for each individual state_name.
-- Clean up the presentation with theme_minimal() and add descriptive titles and axis labels.
+- First, write a pipeline using summarise() to calculate the overall global CFR for the entire dataset.
 
-**Hint: Find the following numbers in the code chunk and replace with the appropriate words. See instructor code.**
+- Next, modify that pipeline using group_by() to calculate and compare the CFR across different states (state_name). Identify which state is experiencing the highest clinical lethality.
 
-Any number within quotations, the appropriate names/labels should be between the quotations
+**Hint: Find the following numbers in the code chunk and replace them with the appropriate words or symbols. Dataframe name**
 
-1.  dataframe name
-2.  the data for the x-axis
-3.  stratifying variable
-4.  x-axis label
-5.  y-axis label
-6.  fill label
+1.  The column name tracking the clinical outcome
+2.  The specific character string value inside that column representing an individual who died (e.g., "dead" or "death")
+3.  The variable you want to group by to look at regional differences
 
-Notice that "binwidth" has a question (?) - replace with the number of days the bin should be
-
-**Hint: Again, see instructor file**
+## Step 6.1 Calculate the global CFR for the entire dataset
 
 ```{r}
-# Create your facetted weekly epi-curve here
-# Create your facetted weekly epi-curve here
-ggplot(data = 1, mapping = aes(x = 2, fill = 3)) +
-  geom_histogram(
-    binwidth = ? ,             # Groups dates into 7-day epi-weeks
-    position = "stack",       # Stacks outcomes on top of each other
-    color = "white",          # Adds clean borders between bars
-    linewidth = 0.2
-  ) +
-  scale_fill_brewer(palette = "Dark2") +
-  #scale_fill_viridis_d(option = "rocket") +
-  #scale_fill_viridis_d(option = "plasma") +
-  facet_wrap(~ state_name, scales = "free_y") + # Allows y-axes to scale to individual state sizing
-  theme_minimal() +
-  labs(
-    title = "Weekly Incidence of Dengue Cases across Sudan States (2025)",
-    subtitle = "Aggregated by 7-day epidemiological windows",
-    x = "4",
-    y = "5",
-    fill = "6"
-  ) +
-  theme(
-    strip.text = element_text(face = "bold"), # Bolds the facet state names
-    legend.position = "bottom"
+# Calculate global CFR for the entire dataset 
+# Proportional Morbidity
+global_cfr <- 1 %>% 
+  summarise(
+    cfr = sum(2 == "death") / n() * 100
   )
+
+global_cfr
+```
+
+## Step 6.2 Calculate and compare the CFR across different states
+
+```{r}
+# Calculate CFR by state
+cfr_by_state <- 1 %>% 
+  group_by(3) %>% 
+  summarise(
+    cfr = sum(2 == "death") / n() * 100
+  ) %>% 
+  arrange(desc(cfr)) # Sort states by CFR in descending order
+
+cfr_by_state  
+```
+
+# Step 7: Proportional Morbidity (Exposure Proportions)
+
+Because surveillance officers frequently operate without population denominators or control groups, you must evaluate shifts in exposure trends purely among known cases.
+
+- Use filter() and dplyr::between() to extract cases occurring during the first week of the outbreak (e.g., January 1 to January 7, 2025). Pass this filtered data to janitor::tabyl() to look at the proportion of a key environmental risk factor like standing water proximity (water_container_status).
+
+- Duplicate that pipeline and adjust the date filter to capture cases from the last week of data in the spreadsheet. Compare your proportions. Did the exposure footprint shift?
+
+\*\* Hint: Find the following numbers in the code chunk and replace them with the appropriate words or variable names.\*\*
+
+1.  Dataframe name
+2.  Date of symptom onset variable
+3.  Environmental risk factor/exposure variable name
+
+## Step 7.1 \# 1. Proportional Morbidity for Week 1 (Jan 1 - Jan 7, 2025)
+
+```{r}
+1 %>%
+  filter(
+    !is.na(2) & 
+    between(2, as.Date("2025-01-01"), as.Date("2025-01-07"))
+  ) %>%
+  tabyl(3) %>%
+  adorn_pct_formatting()
+```
+
+## Step 7.2 Proportional Morbidity for the Late Phase (e.g., Feb 1 - Feb 7, 2025)
+
+**IMPORTANT: runt he code the first time then comment out the first date line and uncomment the second date line to compare the two weeks**
+
+```{r}
+1 %>%
+  filter(
+    !is.na(2) & 
+    between(2, as.Date("2025-02-01"), as.Date("2025-02-07"))
+    #between(2, as.Date("2025-12-25"), as.Date("2025-12-31"))
+  ) %>%
+  tabyl(3) %>%
+  adorn_pct_formatting()
 ```
