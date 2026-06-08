@@ -5,3 +5,7 @@
 
 # Ignore any folder whose name is exactly "Notes" (at any depth)
 **/Notes/
+
+# Ignore auto-generated folder outputs from R Markdown / Quarto
+*_files/
+*_cache/
