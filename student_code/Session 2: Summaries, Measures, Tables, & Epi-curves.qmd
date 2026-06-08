@@ -1,0 +1,215 @@
+---
+title: "Session 2: Summaries, Measures, Tables, & Epi-curves_Exercise"
+author: "Max Wegener"
+format: html
+editor: visual
+---
+
+# Load packages
+
+```{r}
+pacman::p_load(
+  here,
+  rio,
+  tidyverse,
+  janitor,
+  gtsummary,
+  rstatix
+)
+```
+
+# Exercise
+
+- Select one computer to perform the exercise.
+
+- To show that you have completed the exercise, your group will share your code (with demonstration to see console), the final publication-ready "Table 1" output, and your facetted epidemic curve plot.
+
+**HINT: Use the code shown during the instruction for the cholera data as a guide. The coding pipeline and logic are identical—you just need to apply them to the Dengue dataset!**
+
+------------------------------------------------------------------------
+
+## Step 1: Load the Cleaned Data
+
+Import the cleaned Dengue dataset you exported during Session 1 (*dengue_linelist_clean.xlsx*) from the `processed_data` folder using `here()` and `rio()`. Call the object `dengue_linelist`. Ensure you explicitly verify or coerce the `onset_date` column to an R Date format.
+
+```{r}
+# Import cleaned dengue line-list and verify the onset_date format
+
+dengue_linelist <- import(here("processed_data", "dengue_linelist_clean.xlsx")) %>%
+  mutate(onset_date = as.Date(onset_date))
+```
+
+## Step 2: Descriptive Frequency Tables
+
+Using the {janitor} package, generate descriptive tables to understand your study population. Create a simple frequency table showing the distribution of cases across different state_name values, including formatted percentages.
+
+```{r}
+# 1. Simple frequency table for state_names
+# HINT: See Simple frequency table on instructor file
+
+
+```
+
+Create a two-way cross-tabulation looking at sex against clinical outcome. Adorn the table to show row totals and row percentages front-facing (N (Pct%)).
+
+```{r}
+# 2. Adorned two-way table for sex vs. outcome
+# HINT: see Advanced multi-adorned table on instructor file
+
+
+```
+
+## Step 3: Summary Statistics & Simple Hypothesis Testing
+
+We want to evaluate the demographic profile of our cases.
+
+- Use {rstatix} to calculate the overall summary statistics for age.
+- Perform a statistical hypothesis test to determine if the continuous variable age differs significantly across different clinical outcome groups (e.g., recovered vs. death vs. hospitalised).
+
+**Hint: Check the distribution of age first to decide if you should use a parametric (ANOVA) or non-parametric (Kruskal-Wallis) approach!**
+
+```{r}
+#HINT: see Overall summary stats for age on instructor file
+
+
+```
+
+For this let's compare the age distribution of dengue cases between different outcomes
+
+```{r}
+# Run the appropriate hypothesis test for age across outcome groups
+
+# HINT: Use non-parametric test used to compare a contiuous varaible to a variable with more than two values
+
+
+
+```
+
+## Step 4: Constructing a Publication-Ready "Table 1"
+
+Using the {gtsummary} package, assemble a comprehensive baseline characteristics table (tbl_summary) stratified by outcome.
+
+- Include age, sex, state name, and key symptoms (like fever or joint pain).
+- Add an overall sample size column (add_n()).
+- Add p-values (add_p()) using appropriate tests for continuous and categorical variables.
+- Bold the labels and add a professional spanning header called "Clinical Outcome".
+
+**Hint: Find the following numbers in the code chunk and replace with the appropriate words. See instructor code.**
+
+Any number within quotations or asterisks (\*) the appropriate names/labels should be between them as well
+
+1.  Dataframe name
+2.  Variable name
+3.  test name
+4.  test name
+5.  Lable name for spanning header
+6.  Lable name for header
+
+```{r}
+
+table_one <- 1 %>% 
+  select(outcome, age, sex, state_name, serotype, fever, severity, retroorbital_pain) %>% 
+  mutate(across(c(sex, state_name, fever, retroorbital_pain), as.factor)) %>% 
+  tbl_summary(
+    by = 2,
+    statistic = list(
+      all_continuous() ~ "{median} ({p25}, {p75})",
+      all_categorical() ~ "{n} ({p}%)"
+    ),
+    missing = "no"
+  ) %>% 
+  add_n() %>% 
+  add_p(
+    test = list(
+      all_categorical() ~ "3", 
+      all_continuous() ~ "4"
+    )
+  ) %>% 
+  bold_labels() %>% 
+  modify_spanning_header(all_stat_cols() ~ "** 5 **") %>% 
+  modify_header(label = "** 6 **")
+
+table_one
+```
+
+# Step 6: Case Fatality Risk / Ratio (CFR)
+
+Calculate the clinical severity of this outbreak using your case-only surveillance data.
+
+- First, write a pipeline using summarise() to calculate the overall global CFR for the entire dataset.
+
+- Next, modify that pipeline using group_by() to calculate and compare the CFR across different states (state_name). Identify which state is experiencing the highest clinical lethality.
+
+**Hint: Find the following numbers in the code chunk and replace them with the appropriate words or symbols. Dataframe name**
+
+1.  The column name tracking the clinical outcome
+2.  The specific character string value inside that column representing an individual who died (e.g., "dead" or "death")
+3.  The variable you want to group by to look at regional differences
+
+## Step 6.1 Calculate the global CFR for the entire dataset
+
+```{r}
+# Calculate global CFR for the entire dataset 
+# Proportional Morbidity
+global_cfr <- 1 %>% 
+  summarise(
+    cfr = sum(2 == "death") / n() * 100
+  )
+
+global_cfr
+```
+
+## Step 6.2 Calculate and compare the CFR across different states
+
+```{r}
+# Calculate CFR by state
+cfr_by_state <- 1 %>% 
+  group_by(3) %>% 
+  summarise(
+    cfr = sum(2 == "death") / n() * 100
+  ) %>% 
+  arrange(desc(cfr)) # Sort states by CFR in descending order
+
+cfr_by_state  
+```
+
+# Step 7: Proportional Morbidity (Exposure Proportions)
+
+Because surveillance officers frequently operate without population denominators or control groups, you must evaluate shifts in exposure trends purely among known cases.
+
+- Use filter() and dplyr::between() to extract cases occurring during the first week of the outbreak (e.g., January 1 to January 7, 2025). Pass this filtered data to janitor::tabyl() to look at the proportion of a key environmental risk factor like standing water proximity (water_container_status).
+
+- Duplicate that pipeline and adjust the date filter to capture cases from the last week of data in the spreadsheet. Compare your proportions. Did the exposure footprint shift?
+
+\*\* Hint: Find the following numbers in the code chunk and replace them with the appropriate words or variable names.\*\*
+
+1.  Dataframe name
+2.  Date of symptom onset variable
+3.  Environmental risk factor/exposure variable name
+
+## Step 7.1 \# 1. Proportional Morbidity for Week 1 (Jan 1 - Jan 7, 2025)
+
+```{r}
+1 %>%
+  filter(
+    !is.na(2) & 
+    between(2, as.Date("2025-01-01"), as.Date("2025-01-07"))
+  ) %>%
+  tabyl(3) %>%
+  adorn_pct_formatting()
+```
+
+## Step 7.2 Proportional Morbidity for the Late Phase (e.g., Feb 1 - Feb 7, 2025)
+
+**IMPORTANT: runt he code the first time then comment out the first date line and uncomment the second date line to compare the two weeks**
+
+```{r}
+1 %>%
+  filter(
+    !is.na(2) & 
+    between(2, as.Date("2025-02-01"), as.Date("2025-02-07"))
+    #between(2, as.Date("2025-12-25"), as.Date("2025-12-31"))
+  ) %>%
+  tabyl(3) %>%
+  adorn_pct_formatting()
+```

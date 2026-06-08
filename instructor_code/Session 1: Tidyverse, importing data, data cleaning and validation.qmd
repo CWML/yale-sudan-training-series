@@ -7,20 +7,25 @@ editor: visual
 
 # Overview
 
-qfqfqq
+In this session we will cover data improitng, cleaning, and validation using the Tidyverse using a cholera line-list dataset for Sudan. Once we have cleaned the data, we will export it to the "processed_data" folder. We will then do a group exercise where you will be doing the same thing with a dengue line-list dataset for Sudan.
 
 # Packages used for this session
 
 ```{r}
 pacman::p_load(
-  rio,        # importing data  
-  here,       # relative file pathways  
-  janitor,    # data cleaning and tables
-  lubridate,  # working with dates
-  matchmaker, # dictionary-based cleaning
-  epikit,     # age_categories() function
-  tidyverse,  # data management and visualization
-  skimr
+  # ── Core Infrastructure & Data I/O ─────────────────────────────────────────
+  here,         # Relative file pathways to prevent broken working directory links
+  rio,          # Swiss-Army knife for importing/exporting data (xlsx, csv, rds)
+  tidyverse,    # Core ecosystem (ggplot2, dplyr, tidyr) for data science & viz
+
+  # ── Data Cleaning & Standardisation ────────────────────────────────────────
+  janitor,      # Clean column names, find duplicates, and build quick tabyls
+  lubridate,    # Parsing and executing calculations on epidemic date vectors
+  matchmaker,   # Dictionary-based string cleaning and surveillance recoding
+
+# ── Field Epidemiology & Summaries ─────────────────────────────────────────
+  epikit,       # Inline tracking functions and quick age_categories() generation
+  skimr         # Fast, summary summaries of missingness and data distributions
 )
 ```
 
@@ -71,8 +76,9 @@ pacman::p_load(
 ```{r}
 # if your .xlsx has multiple sheets:
 # my_data <- import(here("FOLDER NAME", "DATA_FILE.xlsx"), which = "SHEET_NAME")
+# packages used: rio, here, openxlsx
 
-cholera_linelist_raw <- import(here('raw_data', 'cholera_linelist_2025_sudan.csv'))
+cholera_linelist_raw <- import(here('raw_data', 'cholera_linelist_2025_sudan.xlsx'))
 ```
 
 # Data cleaning and validation
@@ -109,6 +115,7 @@ The **tidyverse** is a collection of R packages designed around shared princip
 
 ### Core Functions
 
+<<<<<<< HEAD
 | Function | Utility | Package |
 |------------------------|------------------------|------------------------|
 | `%>%` | “pipe” (pass) data from one function to the next | **magrittr** |
@@ -130,6 +137,49 @@ The **tidyverse** is a collection of R packages designed around shared princip
 | `age_categories()`and `cut()` | create categorical groups from a numeric column | **epikit** and **base** R |
 | `match_df()` | re-code/clean values using a data dictionary | **matchmaker** |
 | `which()` | apply logical criteria; return indices | **base** R |
+=======
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| Function                                            | Utility                                                        | Package                   |
++=====================================================+================================================================+===========================+
+| `%>%`                                               | “pipe” (pass) data from one function to the next               | **magrittr**              |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `mutate()`                                          | create, transform, and re-define columns                       | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `select()`                                          | keep, remove, select, or re-name columns                       | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `rename()`                                          | rename columns                                                 | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `clean_names()`                                     | standardize the syntax of column names                         | **janitor**               |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `as.character()`, `as.numeric()`, `as.Date()`, etc. | convert the class of a column                                  | **base** R                |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `across()`                                          | transform multiple columns at one time                         | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| **tidyselect** functions                            | use logic to select columns                                    | **tidyselect**            |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `filter()`                                          | keep certain rows                                              | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `distinct()`                                        | de-duplicate rows                                              | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `rowwise()`                                         | operations by/within each row                                  | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `add_row()`                                         | add rows manually                                              | **tibble**                |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `arrange()`                                         | sort rows                                                      | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `recode()`                                          | re-code values in a column                                     | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `case_when()`                                       | re-code values in a column using more complex logical criteria | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `replace_na()`, `na_if()`, `coalesce()`             | special functions for re-coding                                | **tidyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `age_categories()`and `cut()`                       | create categorical groups from a numeric column                | **epikit** and **base** R |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `match_df()`                                        | re-code/clean values using a data dictionary                   | **matchmaker**            |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `which()`                                           | apply logical criteria; return indices                         | **base** R                |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+>>>>>>> 827e908c84ca10e3922b15fbc2d19afa2567d4ee
 
 ## Step 1: inspect the data
 
@@ -148,12 +198,286 @@ The **tidyverse** is a collection of R packages designed around shared princip
 - Data set structure and dimensions
 
 - **If column names are clean (concise, no spaces, no blanks, no dots, no caps)**
+<<<<<<< HEAD
+=======
+
+```{r}
+# Using head 
+head(cholera_linelist_raw)
+```
+>>>>>>> 827e908c84ca10e3922b15fbc2d19afa2567d4ee
 
 ```{r}
 #from skimr package
 skim(cholera_linelist_raw)
 ```
 
+```{r}
+# from glimpse package
+glimpse(cholera_linelist_raw)
+```
+
+**Now let's check character strings to see if:**
+
+- Duplicate entries for the same value due to spelling errors
+
+- inconsistent capitalization
+
+- extra spaces
+
+- if there are more values what you were expecting
+
+```{r}
+# Let's inspect the State varaible
+cholera_linelist_raw %>% count(State)
+```
+
+```{r}
+# Let's inspect the State varaible
+cholera_linelist_raw %>% count(source water)
+```
+
 ### what issues did you identify?
 
+<<<<<<< HEAD
 ## Step 2:
+=======
++--------------------------------------------------------------------------------------+
+|                                                                                      |
++:=====================================================================================+
+| Column Names: Mixed naming conventions, caps, spaces, dots                           |
++--------------------------------------------------------------------------------------+
+| other dates are POSIXct but we can make them *Dates* for ease and consistency        |
++--------------------------------------------------------------------------------------+
+| State: some are misspelled                                                           |
++--------------------------------------------------------------------------------------+
+| age is shown as character value                                                      |
++--------------------------------------------------------------------------------------+
+| Every symptom has some missing data                                                  |
++--------------------------------------------------------------------------------------+
+| this code doe not work because there is a space in the variable name "source water"\ |
+| \                                                                                    |
+| cholera_linelist_raw %\>% count(source water)                                        |
++--------------------------------------------------------------------------------------+
+
+## Step 2: Clean data using Tiduverse
+
+Using **Tidyverse** packages, we build one single cleaning pipeline using the pipe operator (`%>%`). Each pipe passes the result of one step to the next.
+
+### 💡 **Pro Tip:**
+
+We assign the result to a **new** data frame (`cholera_linelist_clean`) using `<-` to preserve the original raw data — always protect your raw data!
+
+### We are going to do the following cleaning steps in one pipeline:
+
+#### 2a. Standardize Column Names
+
+`clean_names()` from **janitor** automatically converts all column names to `snake_case` (e.g., `date onset` → `date_onset`).
+
+### 2b — Convert Date Columns to Date Format
+
+`mutate()` + `as.Date()` converts "date onset" from POSIXct to an easier to use general date variable — required for any sorting, filtering, or date math.
+
+### 2c — Rename Columns
+
+`rename()` gives three columns clearer, more descriptive names:
+
+| Old Name       | New Name        |
+|----------------|-----------------|
+| `date_onset`   | `onset_date`    |
+| `lat`          | `latitiude`     |
+| `lon`          | `longitutde`    |
+| `source_water` | `water_sorucee` |
+
+### 2d — Standardise categorical text (“State” and “Sex”)
+
+Many surveillance variables are free-text. Typos, mixed capitals, or different languages make analysis impossible until they are harmonised. We tackle two of them:
+
+1.  **State** – turn “Blue Nile”, “Blu Nile”, “blue_nile”… into a single value “Blue Nile”.
+2.  **Sex** – collapse “M”, “Male ”, “male”, “F ”, “Female”, blanks, etc. into the tidy set of values (male, female, unknown).
+
+We use mutate() + case_when() (with stringr::str_detect() for pattern matching). The first matching rule wins; anything that matches nothing (including NA or empty strings) falls through to "unknown".
+
+```{r}
+# Let's inspect the State varaible
+cholera_linelist_raw %>% count(State)
+```
+
+```{r}
+# Let's inspect the State varaible
+cholera_linelist_raw %>% count(SEX)
+```
+
+### 2e — Create Epidemiologically Meaningful Age Groups
+
+Age is numeric in the raw line list, but most descriptive analyses and visualisations of cholera data require age strata (e.g., to calculate age-specific attack rates or draw epidemic curves by age band).\
+In this step we transform the single “age” column into an ordered factor called **age_group** with six mutually exclusive categories:
+
+• 0–4 • 5–14 • 15–29 • 30–44 • 45–59 • 60 +
+
+Why group ages?
+
+• Interpretability – health audiences more easily grasp “cases among children 0–4 yrs” than a mean age of 6.3.\
+• Comparability – standard WHO/UNICEF age bands match other outbreak reports and surveillance systems.\
+• Stability – categorical rates are less sensitive to heaping or single-year mis-reporting.\
+• Privacy – grouping reduces the risk of identifying very old or very young individuals in small datasets.
+
+Implementation with the tidyverse:
+
+1.  `mutate()` adds a new variable without altering the raw `age`. 
+
+2.  `cut()` bins ages using explicit break points: `c(0, 5, 15, 30, 45, 60, Inf)`. 
+
+3.  `right = FALSE` produces half-open intervals `[a, b)` so age 5 falls in “5–14”, not “0–4”. 
+
+4.  `include.lowest = TRUE` ensures newborns (age 0) are included in the first band. 
+
+5.  Custom `labels = c("0–4", …, "60+")` give reader-friendly category names. 
+
+6.  Because `cut()` returns a factor ordered by the break sequence, plots and tables will display age groups in the correct epidemiological order without extra sorting code.
+
+### 2f — Handling missing values in the symptom variables
+
+For surveillance data we rarely delete records; instead we make missingness explicit so it is counted and reported.\
+In this project we recode every blank or `NA` symptom entry to the literal value **"Unknown"**.
+
+Why this approach?\
+• “Unknown” appears in tables and plots, reminding users that information was not recorded.\
+• Numeric columns stay unchanged, so analytical calculations (rates, medians, etc.) are unaffected.\
+• The pipeline is fully reproducible and works for any future dataset with the same structure.
+
+Steps implemented with the tidyverse:
+
+1.  `mutate()` updates the data frame in place. 
+
+2.  `across()` applies the same rule to all text variables. 
+
+3.  `where(is.character)` limits the change to character columns only. 
+
+4.  `trimws()` strips invisible spaces, `na_if()` turns empty strings into `NA`, and `replace_na()` converts those `NA` (plus any that were already present) to `"Unknown"`.
+
+### 2g — Select and Order Final Variables
+
+`select()` keeps only the necessary variables and arranges them in a logical order for interpretation before exporting the finalized dataset. You can also drop specific variables using the `-` sign, for emaple `select(-state)` would drop the original state variable since we have created a new one with the correct names.
+
+### Start cleaning
+
+This code chunk contains the complete workflow for cleaning the dataset, and you can run all the code between the pipes `%>%`.
+
+```{r}
+# packages used: janitor, dplyr, stringr, tidyr, tidyverse
+
+cholera_linelist_clean <- cholera_linelist_raw %>%
+  # STEP 2a: Standardize all column names to snake_case (lowercase with underscores)
+  # Example: "Date Of Onset" becomes "date_of_onset"
+  clean_names() %>%
+
+  # STEP 2b: Convert date columns from character strings to proper R Date objects
+  # This is required before doing any date math or sorting by date
+  mutate(date_onset = as.Date(date_onset)) %>%
+  # STEP 2c: Rename columns to be more descriptive and consistent
+  # new name (left)  →  Old name (right)
+  # onset_date   →  date_onset
+  # latitude     →  lat
+  # longitutde   →  lon
+  # water_source → source_water
+  rename(
+    onset_date   = date_onset,
+    latitude     = lat,
+    longitude   = lon,
+    water_source = source_water 
+  ) %>%
+  # STEP 2d: Standardise messy categorical text
+  # State  → new variable `state_name`
+  #     - str_detect() searches the raw `state` values for spelling fragments
+  #     - case_when() applies the first matching rule, else “Other/Unknown”
+  # Sex    → overwrites `sex`
+  #     - handles “M/m/Male/male…”, “F/f/Female/female…”, blanks, and NA
+  #     - maps everything to lowercase `male`, `female`, or `unknown`
+  #   str_detect() does the pattern matching;
+  #   case_when() chains the if/else logic (first match wins).
+ mutate(
+    # ----- State -------------------------------------------------------
+    state_name = case_when(
+      str_detect(state, regex("blu|blue",  ignore_case = TRUE)) ~ "Blue Nile",
+      str_detect(state, regex("gez",       ignore_case = TRUE)) ~ "Gezira",
+      str_detect(state, regex("kass",      ignore_case = TRUE)) ~ "Kassala",
+      str_detect(state, regex("^khar",     ignore_case = TRUE)) ~ "Khartoum",
+      str_detect(state, regex("north",     ignore_case = TRUE)) ~ "North Darfur",
+      str_detect(state, regex("red",       ignore_case = TRUE)) ~ "Red Sea",
+      str_detect(state, regex("south",     ignore_case = TRUE)) ~ "South Darfur",
+      str_detect(state, regex("white",     ignore_case = TRUE)) ~ "White Nile",
+      is.na(state) | str_trim(state) == ""                       ~ "Other/Unknown",
+      TRUE                                                       ~ "Other/Unknown"
+    ),
+    
+    # ----- Sex ---------------------------------------------------------
+    sex = case_when(
+      str_detect(sex, regex("^m$",      ignore_case = TRUE)) ~ "male",
+      str_detect(sex, regex("^male$",   ignore_case = TRUE)) ~ "male",
+      str_detect(sex, regex("^f$",      ignore_case = TRUE)) ~ "female",
+      str_detect(sex, regex("^female$", ignore_case = TRUE)) ~ "female",
+      is.na(sex) | str_trim(sex) == ""                       ~ "unknown",
+      TRUE                                                   ~ "unknown"
+    )
+  ) %>% 
+  
+  # STEP 2e ── Derive ordered age-group factor ---------------------------
+  mutate(
+    age_group = cut(
+      age,
+      breaks = c(0, 5, 15, 30, 45, 60, Inf),   # interval end-points
+      right   = FALSE,                         # left-closed, right-open [a, b)
+      include.lowest = TRUE,
+      labels = c("0–4", "5–14", "15–29",
+                 "30–44", "45–59", "60+")
+    )
+  ) %>%
+  # STEP 2f: Change blanks or NA values to "unknown" 
+  mutate(
+    across(
+      where(is.character),
+      ~ replace_na( na_if(trimws(.x), ""), "unknown" )
+    )
+  ) %>%
+  # STEP 2g: Select only the variables we need for analysis and arrange them in
+  select(case_id, onset_date, state_name, age_group, everything(), -state)
+```
+
+### Reinspect your cleaned data
+
+```{r}
+# Let's inspect the state_name varaible
+cholera_linelist_clean %>% count(state_name)
+```
+
+```{r}
+# Let's inspect the sex varaible
+cholera_linelist_clean %>% count(sex)
+```
+
+```{r}
+# Using the skimr package to inspect the cleaned data
+skim(cholera_linelist_clean)
+```
+
+# Export data to the "processed_data" folder using Rio() and Here()
+
+In the same spirit that we *imported* raw files earlier (`rio::import(here("raw_data", …))`), we now *export* our cleaned line-list with two helper packages:
+
+• **`rio`** – wraps dozens of I/O functions behind a single verb, `export()`. The file type is inferred from the extension you give it (`.csv`, `.xlsx`, `.rds`, etc.).\
+• **`here`** – builds file paths that always start at the project root, so your code runs on any machine without fiddling with the working directory.
+
+```{r}
+# export the cleaned line-list to an Excel file in the "processed_data" folder
+# packages used: rio, here, openxlsx
+export(cholera_linelist_clean, here('processed_data', 'cholera_linelist_clean.xlsx'))
+```
+
+### Step 3: Group exercise
+
+#### In groups of 4 or 5 do similar importing, inspecting, cleaning, and exporting for the dengue file in the raw_data folder
+
+- Navigate to the student_code folder and open *Session 1: Tidyverse, importing data, data cleaning and validation_exercise.qmd* and complete the exercise
+- You will be doing the same things we just covered on the *dengue_linelist_2025.xlsx* in the "raw_data" folder
+>>>>>>> 827e908c84ca10e3922b15fbc2d19afa2567d4ee
