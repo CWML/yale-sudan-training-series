@@ -13,13 +13,13 @@ What are the dates and time EST?
 1.  ~~R project~~
 2.  Readme
 3.  ~~Disease linelist for training~~
-    -   ~~Malaria~~
-    -   ~~Dengue~~
-    -   ~~Cholera~~
+    - ~~Malaria~~
+    - ~~Dengue~~
+    - ~~Cholera~~
 4.  ~~Sudan shape files~~
 5.  Use teaching assistants for trouble shooting
 6.  best way to trouble shoot issues via zoom?
-    -   discuss issues during the class for some and use breakout rooms for others
+    - discuss issues during the class for some and use breakout rooms for others
 7.  breakout room for group exercises?
 
 We can teach using one dataset and they follow along with another - basically they will create a "report" with all the code and visualizations in a qmd file?
@@ -155,15 +155,15 @@ pacman::p_load(
 
 ## Introduction to R coding - Sofia
 
--   ARCS session 2 stuff
--   discuss packages
--   coding environments
+- ARCS session 2 stuff
+- discuss packages
+- coding environments
 
 ## Data management using R projects - Levi
 
 ## Intro to markdown syntax and QMD -Levi
 
--   discuss source() functionality?
+- discuss source() functionality?
 
 ## The tidyverse - Max
 

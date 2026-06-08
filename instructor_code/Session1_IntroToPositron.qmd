@@ -1,0 +1,101 @@
+---
+title: "Intro to Positron and R Programing"
+author: "Sofia Fertuzinhos"
+format: html
+editor: visual
+---
+
+# Location. Location. Location: Setting up the Working Directory**
+
+## What is a Working Directory?**
+
+The working directory is the folder on your computer where R will look for files (e.g., data) and save outputs by default. Think of it as telling R: \*"This is the folder we are working in today."\*
+
+------------------------------------------------------------------------
+
+### Step 1: Check Your Current Working Directory**
+
+Use \`getwd()\` to see where R is currently pointed to on your computer. It will return a file path in the console, for example:
+
+``` illustration
+[1] "/Users/yourname/Documents"
+```
+
+```{r}
+#| label: getwd
+#| eval: false
+getwd()
+```
+
+\> 💡 **\*\*Tip:\*\*** To learn more about **\*\*any\*\*** function in R, type \`?\` followed \> by its name in the console and press Enter. Try it: \> \`\`\` \> ?getwd \> ?setwd \> \`\`\`
+
+------------------------------------------------------------------------
+
+### Step 2: Set Your Working Directory**
+
+We want R to point to the folder where **\*\*your data is stored\*\***. There are two ways to do this:
+
+#### ✅ Option A — Point-and-Click \*(recommended for beginners)\***
+
+[1.]{.underline} Look at the **\*\*bottom-right panel\*\*** in RStudio and click the **\*\*Files\*\*** tab.
+
+[2.]{.underline} Navigate to the folder where your data is saved.
+
+[3.]{.underline} Click the **\*\*gear icon (⚙)\*\*** in the Files toolbar.
+
+[4.]{.underline} Select **\*\*"Set As Working Directory"\*\***.
+
+\> 👀 Watch the Console — Positron will automatically run a \`setwd()\` command \> for you, and the path will be printed there.
+
+#### ✅ Option B — Programmatic**
+
+Use \`setwd()\` and provide the full path to your data folder. Replace the example path below with **\*\*your\*\*** folder's actual path:
+
+```{r}
+#| label: setwd
+#| eval: false
+# setwd("~/Documents/my_data_folder") # <-- edit this path and remove # before runing cell
+```
+
+To confirm it worked, run \`getwd()\` again:
+
+```{r}
+#| eval: false 
+getwd()
+```
+
+\`\`\` \`\`\`
+
+------------------------------------------------------------------------
+
+### ⚠ Common Pitfalls**
+
+::: callout-warning
+**\*\*Windows users:\*\*** R uses forward slashes (\`/\`) or double backslashes (\`\\\\\`), **\*\*not\*\*** single backslashes (\`\\\`) like Windows Explorer shows.
+
+❌ Wrong:
+
+setwd("C:\\Users\\yourname\\Documents\\data") \`\`\`
+
+✅ Right:
+
+setwd("C:/Users/yourname/Documents/data")
+
+\# or
+
+setwd("C:\\\\Users\\\\yourname\\\\Documents\\\\data")
+:::
+
+::: callout-warning
+The path must point to a **\*\*folder\*\***, not a file.
+:::
+
+::: callout-warning
+\`setwd()\` only lasts for your **\*\*current R session\*\***. Each time you restart R, you will need to set it again — unless you use an Positron Project \*(introduced later in this course)\*.
+:::
+
+------------------------------------------------------------------------
+
+### 🚀 A Better Long-Term Habit: RStudio Projects**
+
+As you grow more comfortable with R, consider using **\*\*Positron Projects\*\*** (\`.Rproj\`). They automatically set the working directory to your project folder every time you open them — no \`setwd()\` needed! We will cover RStudio Projects later in this workshop.
