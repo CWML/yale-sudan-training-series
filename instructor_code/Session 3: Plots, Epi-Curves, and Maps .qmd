@@ -423,3 +423,5 @@ Open `student_code / Session 3: Epi-Curves and Maps_Exercise.qmd` to begin. Be
 - [**Hands-On Programming with R (HOPR)**](https://rstudio-education.github.io/hopr/) Garrett Grolemund’s user-friendly introduction to data science basics. Highly recommended for absolute beginners in the class who need practice with basic data structures, vectors, and loops.
 
 - [**R for Data Science (R4DS)**](https://r4ds.had.co.nz/) The industry-standard text by Hadley Wickham and Garrett Grolemund focusing on the `tidyverse` ecosystem. This is the core reference for data transformation with `dplyr`, reshaping with `tidyr`, and programmatic plotting with `ggplot2`.
+
+- [Shiny by Posit ](https://shiny.posit.co)– The official Shiny homepage, with tutorials, galleries, and documentation for building interactive web applications in R.
