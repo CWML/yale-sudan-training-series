@@ -1,5 +1,5 @@
 # ============================================================
-# Title:  Introduction to Programming in R for Epidemiology
+# Title:  Session 1 - Introduction to Programming in R for Epidemiology
 #         Part 1: Fundamentals and Data Structures
 # Author: Sofia Fertuzinhos, PhD
 # Date:   Jun 15th, 2026
@@ -7,15 +7,18 @@
 
 # Welcome to Positron! A few orientation notes before we begin:
 #
-# "Built by Posit, Positron is a next-generation data science IDE based
-# on the Code OSS foundation of VS Code. It provides a modern editor 
-# designed to be highly similar and familiar to RStudio users.
+# Positron is built by Posit and is a next-generation data science IDE 
+# (Integrated Development Environment) based on the Code OSS foundation of
+# VS Code. It provides a modern editor designed to be highly similar and
+# familiar to RStudio users.
 # 
 # - The Editor (center): Your primary window for writing and editing scripts.
-# - The Console (bottom panel): The fully interactive space where your code executes.
-# - The Variables Pane (right sidebar): The dedicated area to inspect your defined
-#  data objects and environments.
-# - The Plots & Help Panes (right sidebar): Your central hubs for viewing data visualizations and reading documentation.
+# - The Console (bottom panel): The fully interactive space where your code 
+#   executes.
+# - The Variables Pane (right sidebar): The dedicated area to inspect your 
+#   defined data objects and environments.
+# - The Plots & Help Panes (right sidebar): Your central hubs for viewing data
+#   visualizations and reading documentation.
 #
 # To run a single line of code: place your cursor on the line and press
 #   Ctrl + Enter (Windows/Linux) 
@@ -34,6 +37,7 @@
 #---- Setting up your working directory ----#
 
 # Check where R is currently looking for files:
+
 getwd()
 
 # In Positron, you can set your working directory via the file explorer:
