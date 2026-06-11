@@ -10,7 +10,7 @@ editor: visual
 This session focuses on the visual and spatial dimensions of field epidemiology. Students will progress from exploratory continuous plotting to constructing advanced, publication-ready temporal and geographical models used to brief ministry leaders during an active emergency.
 
 | Aim | Tool / function |
-|--------------------------|----------------------------------------------|
+|---------------------------|---------------------------------------------|
 | 1\. Construct stratified temporal plots | **ggplot2::geom_histogram()** & **geom_col()** |
 | 2\. Smooth operational artifacts | **slider::slide_index_dbl()** rolling curves |
 | 3\. Manage geospatial data vectors | **sf::st_as_sf()** & **sf::st_transform()** |
@@ -63,11 +63,11 @@ An epi-curve provides essential visual clues about the outbreak's magnitude, out
 
 - A common source exposure where the transmission window is brief and all cases cluster within a single incubation period.
 
-- Continuous Common Source: Exposure is prolonged or persistent, causing cases to rise gradually and form a plateau rather than a sharp peak.
+  - **Continuous Common Source**: Exposure is prolonged or persistent, causing cases to rise gradually and form a plateau rather than a sharp peak.
 
-- Intermittent Common Source: Exposure occurs sporadically, producing irregular, jagged peaks reflecting the timing of the vehicle's availability.
+  - **Intermittent Common Source:** Exposure occurs sporadically, producing irregular, jagged peaks reflecting the timing of the vehicle's availability.
 
-- Propagated Outbreak: Spread person-to-person. These epidemics display progressively taller, compounding waves spaced roughly one incubation period apart.
+- **Propagated Outbreak:** Spread person-to-person. These epidemics display progressively taller, compounding waves spaced roughly one incubation period apart.
 
 ## Basic Data Visualization: Understanding Age Distribution
 
@@ -424,4 +424,4 @@ Open `student_code / Session 3: Epi-Curves and Maps_Exercise.qmd` to begin. Be
 
 - [**R for Data Science (R4DS)**](https://r4ds.had.co.nz/) The industry-standard text by Hadley Wickham and Garrett Grolemund focusing on the `tidyverse` ecosystem. This is the core reference for data transformation with `dplyr`, reshaping with `tidyr`, and programmatic plotting with `ggplot2`.
 
-- [**Shiny by Posit** ](https://shiny.posit.co)– The official Shiny homepage, with tutorials, galleries, and documentation for building interactive web applications in R.
+- [**Shiny by Posit**](https://shiny.posit.co)– The official Shiny homepage, with tutorials, galleries, and documentation for building interactive web applications in R.
