@@ -30,9 +30,7 @@
 # or 
 #   Cmd + Shift + Enter (Mac)
 #
-# To get help on any function, run in the Console:
-#   ?function_name
-
+# The code will run in the Console
 
 #---- Setting up your working directory ----#
 
