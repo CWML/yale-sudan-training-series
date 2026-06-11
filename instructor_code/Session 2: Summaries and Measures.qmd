@@ -352,7 +352,7 @@ cholera_linelist %>%
 
 Time allowed: 45 minutes
 
-Working in your assigned groups of 4 or 5, you will apply the analytical principles practiced above to a different epidemiological dataset: dengue_linelist_2025_sudan.xlsx.
+Working in your assigned 3 groups of 4 or 5, you will apply the analytical principles practiced above to a different epidemiological dataset: dengue_linelist_2025_sudan.xlsx.
 
 Your Objectives:
 
