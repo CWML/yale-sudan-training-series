@@ -110,7 +110,19 @@ pacman::p_load(
 cholera_linelist_raw <- import(here('raw_data', 'cholera_linelist_2025_sudan.xlsx'))
 ```
 
-\[exercise break\]
++------------------------------------------------------------------------------------------------------------------------------------------------+
+| Exercise Breakout                                                                                                                              |
++================================================================================================================================================+
+| We’ll pause for a short breakout exercise. You’ll be placed into breakout rooms now.                                                           |
+|                                                                                                                                                |
+| Please open **“Session 1: Tidyverse, importing data, data cleaning and validation_Exercise”**. Once it opens:                                  |
+|                                                                                                                                                |
+| 1.  Load the packages listed at the top of the file.                                                                                           |
+|                                                                                                                                                |
+| 2.  Complete **Step 1: Importing Data**.                                                                                                       |
+|                                                                                                                                                |
+| You can work on this together in your breakout room—talk through the steps and problem-solve as a group. You’ll have **10 minutes** to finish. |
++------------------------------------------------------------------------------------------------------------------------------------------------+
 
 # Data cleaning and validation
 
@@ -146,27 +158,47 @@ The **tidyverse** is a collection of R packages designed around shared princip
 
 ### Core Functions
 
-| Function | Utility | Package |
-|------------------------|------------------------|------------------------|
-| `%>%` | “pipe” (pass) data from one function to the next | **magrittr** |
-| `mutate()` | create, transform, and re-define columns | **dplyr** |
-| `select()` | keep, remove, select, or re-name columns | **dplyr** |
-| `rename()` | rename columns | **dplyr** |
-| `clean_names()` | standardize the syntax of column names | **janitor** |
-| `as.character()`, `as.numeric()`, `as.Date()`, etc. | convert the class of a column | **base** R |
-| `across()` | transform multiple columns at one time | **dplyr** |
-| **tidyselect** functions | use logic to select columns | **tidyselect** |
-| `filter()` | keep certain rows | **dplyr** |
-| `distinct()` | de-duplicate rows | **dplyr** |
-| `rowwise()` | operations by/within each row | **dplyr** |
-| `add_row()` | add rows manually | **tibble** |
-| `arrange()` | sort rows | **dplyr** |
-| `recode()` | re-code values in a column | **dplyr** |
-| `case_when()` | re-code values in a column using more complex logical criteria | **dplyr** |
-| `replace_na()`, `na_if()`, `coalesce()` | special functions for re-coding | **tidyr** |
-| `age_categories()` and `cut()` | create categorical groups from a numeric column | **epikit** and **base** R |
-| `match_df()` | re-code/clean values using a data dictionary | **matchmaker** |
-| `which()` | apply logical criteria; return indices | **base** R |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| Function                                            | Utility                                                        | Package                   |
++=====================================================+================================================================+===========================+
+| `%>%`                                               | “pipe” (pass) data from one function to the next               | **magrittr**              |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `mutate()`                                          | create, transform, and re-define columns                       | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `select()`                                          | keep, remove, select, or re-name columns                       | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `rename()`                                          | rename columns                                                 | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `clean_names()`                                     | standardize the syntax of column names                         | **janitor**               |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `as.character()`, `as.numeric()`, `as.Date()`, etc. | convert the class of a column                                  | **base** R                |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `across()`                                          | transform multiple columns at one time                         | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| **tidyselect** functions                            | use logic to select columns                                    | **tidyselect**            |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `filter()`                                          | keep certain rows                                              | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `distinct()`                                        | de-duplicate rows                                              | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `rowwise()`                                         | operations by/within each row                                  | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `add_row()`                                         | add rows manually                                              | **tibble**                |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `arrange()`                                         | sort rows                                                      | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `recode()`                                          | re-code values in a column                                     | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `case_when()`                                       | re-code values in a column using more complex logical criteria | **dplyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `replace_na()`, `na_if()`, `coalesce()`             | special functions for re-coding                                | **tidyr**                 |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `age_categories()` and `cut()`                      | create categorical groups from a numeric column                | **epikit** and **base** R |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `match_df()`                                        | re-code/clean values using a data dictionary                   | **matchmaker**            |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
+| `which()`                                           | apply logical criteria; return indices                         | **base** R                |
++-----------------------------------------------------+----------------------------------------------------------------+---------------------------+
 
 ## Step 1: inspect the data
 
@@ -223,14 +255,21 @@ cholera_linelist_raw %>% count(source_water)
 
 ### what issues did you identify?
 
-| Issue |
-|------------------------------------------------------------------------|
-| Column Names: Mixed naming conventions, caps, spaces, dots |
-| Other dates are POSIXct but we can make them *Dates* for ease and consistency |
-| State: some are misspelled |
-| Age is shown as character value |
-| Every symptom has some missing data |
++-------------------------------------------------------------------------------------------------------------------------------------------+
+| Issue                                                                                                                                     |
++===========================================================================================================================================+
+| Column Names: Mixed naming conventions, caps, spaces, dots                                                                                |
++-------------------------------------------------------------------------------------------------------------------------------------------+
+| Other dates are POSIXct but we can make them *Dates* for ease and consistency                                                             |
++-------------------------------------------------------------------------------------------------------------------------------------------+
+| State: some are misspelled                                                                                                                |
++-------------------------------------------------------------------------------------------------------------------------------------------+
+| Age is shown as character value                                                                                                           |
++-------------------------------------------------------------------------------------------------------------------------------------------+
+| Every symptom has some missing data                                                                                                       |
++-------------------------------------------------------------------------------------------------------------------------------------------+
 | This code does not work because there is a space in the variable name `source water`: `cholera_linelist_raw %>% count(\`source water\`)\` |
++-------------------------------------------------------------------------------------------------------------------------------------------+
 
 ## Step 2: Clean data using Tiduverse
 
@@ -416,6 +455,20 @@ cholera_linelist_clean <- cholera_linelist_raw %>%
   select(case_id, onset_date, state_name, age_group, everything(), -state)
 ```
 
++------------------------------------------------------------------------------------------------------------------------------------------------+
+| Exercise Breakout                                                                                                                              |
++================================================================================================================================================+
+| We’ll pause for a short breakout exercise. You’ll be placed into breakout rooms now.                                                           |
+|                                                                                                                                                |
+| Please open **“Session 1: Tidyverse, importing data, data cleaning and validation_Exercise”**. Once it opens:                                  |
+|                                                                                                                                                |
+| 1.  Load the packages listed at the top of the file.                                                                                           |
+|                                                                                                                                                |
+| 2.  Complete **Step 2: Data Cleaning using the tidyverse**                                                                                     |
+|                                                                                                                                                |
+| You can work on this together in your breakout room—talk through the steps and problem-solve as a group. You’ll have **20 minutes** to finish. |
++------------------------------------------------------------------------------------------------------------------------------------------------+
+
 ### Reinspect your cleaned data
 
 ```{r}
@@ -445,3 +498,17 @@ In the same spirit that we *imported* raw files earlier (`rio::import(here("ra
 # packages used: rio, here, openxlsx
 export(cholera_linelist_clean, here('processed_data', 'cholera_linelist_clean.xlsx'))
 ```
+
++------------------------------------------------------------------------------------------------------------------------------------------------+
+| Exercise Breakout                                                                                                                              |
++================================================================================================================================================+
+| We’ll pause for a short breakout exercise. You’ll be placed into breakout rooms now.                                                           |
+|                                                                                                                                                |
+| Please open **“Session 1: Tidyverse, importing data, data cleaning and validation_Exercise”**. Once it opens:                                  |
+|                                                                                                                                                |
+| 1.  Load the packages listed at the top of the file.                                                                                           |
+|                                                                                                                                                |
+| 2.  Complete **Step 3: Reinpect the cleaned dataframe** and **Step 4: Exporting Cleaned Data**                                                 |
+|                                                                                                                                                |
+| You can work on this together in your breakout room—talk through the steps and problem-solve as a group. You’ll have **15 minutes** to finish. |
++------------------------------------------------------------------------------------------------------------------------------------------------+

@@ -24,11 +24,7 @@ pacman::p_load(
 
 # Exercise
 
-- Select one computer to perform the exercise.
-
-- To show that you have completed the exercise, your group will share your code, your final population-standardized Dengue incidence map, and your interactive point-source coordinate visualization.
-
-**HINT: Use the code shown during the instruction for the cholera data as a guide. The coding pipeline and logic are identical—you just need to apply them to the Dengue dataset and shapefiles!**
+**Use the code shown during the instruction for the cholera data as a guide. The coding pipeline and logic are identical—you just need to apply them to the Dengue dataset and shapefiles!**
 
 ## Step 1: Load and Prepare the Cleaned Data
 

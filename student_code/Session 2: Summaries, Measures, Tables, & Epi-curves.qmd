@@ -20,11 +20,7 @@ pacman::p_load(
 
 # Exercise
 
-- Select one computer to perform the exercise.
-
-- To show that you have completed the exercise, your group will share your code (with demonstration to see console), the final publication-ready "Table 1" output, and your facetted epidemic curve plot.
-
-**HINT: Use the code shown during the instruction for the cholera data as a guide. The coding pipeline and logic are identical—you just need to apply them to the Dengue dataset!**
+**Use the code shown during the instruction for the cholera data as a guide. The coding pipeline and logic are identical—you just need to apply them to the Dengue dataset!**
 
 ------------------------------------------------------------------------
 
