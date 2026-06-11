@@ -137,7 +137,7 @@ Any number within quotations or asterisks (\*) the appropriate names/labels shou
 
 ```
 
-## Step 3: Reinpect the cleaned dataframe=
+## Step 3: Reinspect the cleaned dataframe
 
 Here is where you will count the new state_name variable to ensure you address all the spelling mistakes
 
