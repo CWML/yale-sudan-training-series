@@ -5,13 +5,7 @@ format: html
 editor: visual
 ---
 
-# Exercise
-
-- Select one computer to perform the exercise
-
-- To show that you have completed the exercise, you group will share code in the file as well as the state_name counts output and the skim() output for the cleaned dataset.
-
-## Load packages
+# Load packages
 
 ```{r}
 pacman::p_load(
@@ -25,6 +19,13 @@ pacman::p_load(
   skimr       
 )
 ```
+
+# Exercise
+
+- Select one computer to perform the exercise
+
+- To show that you have completed the exercise, you group will share code in the file as well as the state_name counts output and the skim() output for the cleaned dataset.
+
 
 **HINT: Use the code shown during the instruction for eh cholera data as a guide, the coding and flow are pretty much identical**
 
@@ -53,9 +54,9 @@ Any number within quotations or asterisks (\*) the appropriate names/labels shou
 4.  New column name (see table below)
 5.  New column name (see table below)
 6.  New column name (see table below)
-7. New column name for state variable
-8. current varaible name for male and female values
-9. New column name for age group variable
+7.  New column name for state variable
+8.  current varaible name for male and female values
+9.  New column name for age group variable
 10. New value to replace blanks and NAs in character columns
 
 - Start by updating the name of the DF to "dengue_linelist_clean*"*
