@@ -1,5 +1,5 @@
 # ============================================================
-# Title:  Introduction to Programming in R for Epidemiology
+# Title:  Session 1 - Introduction to Programming in R for Epidemiology
 #         Part 1: Fundamentals and Data Structures
 # Author: Sofia Fertuzinhos, PhD
 # Date:   Jun 15th, 2026
@@ -7,15 +7,18 @@
 
 # Welcome to Positron! A few orientation notes before we begin:
 #
-# "Built by Posit, Positron is a next-generation data science IDE based
-# on the Code OSS foundation of VS Code. It provides a modern editor 
-# designed to be highly similar and familiar to RStudio users.
+# Positron is built by Posit and is a next-generation data science IDE 
+# (Integrated Development Environment) based on the Code OSS foundation of
+# VS Code. It provides a modern editor designed to be highly similar and
+# familiar to RStudio users.
 # 
 # - The Editor (center): Your primary window for writing and editing scripts.
-# - The Console (bottom panel): The fully interactive space where your code executes.
-# - The Variables Pane (right sidebar): The dedicated area to inspect your defined
-#  data objects and environments.
-# - The Plots & Help Panes (right sidebar): Your central hubs for viewing data visualizations and reading documentation.
+# - The Console (bottom panel): The fully interactive space where your code 
+#   executes.
+# - The Variables Pane (right sidebar): The dedicated area to inspect your 
+#   defined data objects and environments.
+# - The Plots & Help Panes (right sidebar): Your central hubs for viewing data
+#   visualizations and reading documentation.
 #
 # To run a single line of code: place your cursor on the line and press
 #   Ctrl + Enter (Windows/Linux) 
@@ -27,13 +30,12 @@
 # or 
 #   Cmd + Shift + Enter (Mac)
 #
-# To get help on any function, run in the Console:
-#   ?function_name
-
+# The code will run in the Console
 
 #---- Setting up your working directory ----#
 
 # Check where R is currently looking for files:
+
 getwd()
 
 # In Positron, you can set your working directory via the file explorer:
@@ -44,23 +46,24 @@ getwd()
 # setwd("full/path/to/your/folder")
 #
 # Best practice: use an R Project (.Rproj) so your working
-# directory is set automatically every time you open the project.
-# File > New Project in Positron works exactly like RStudio.
-
+# directory is set automatically every time you open the project. In Positron
+# you can do this by simply going to File > New Folder From Template. 
+# It will create a new project folder with automated setup (environment, 
+# version control, directory structure).
 
 #---- Four basic rules for writing R code ----#
 
-# 1. Use # to annotate and document your code.
-#    R ignores everything after # on the same line.
+# 1. In a simple R script like this one, use # to annotate and 
+# document your code. R ignores everything after # on the same line.
 
 # 2. Use visible section breaks to organise your script,
 #    for example:
-#---- ----#
+#---- *title* ----#
 
 # 3. Numbers and arithmetic work just as on paper:
 
 # A year
-2025
+2026
 
 # Basic arithmetic
 100 + 23     # addition
@@ -82,10 +85,11 @@ getwd()
 # will return an error if none exists.
 
 # Exercise 1:
-# Run the line below. Read the error message. Then fix it
-# by adding quotation marks and run it again.
+# Write a word and run the line. 
 
-# Sudan
+
+# What happened? R cannot interpret the word as a string of characters
+# unless it is ...... ?
 
 
 #---- Storing information in R objects ----#
@@ -106,19 +110,22 @@ paste("Outbreak location:", location)
 # Exercise 2:
 # a) Assign the current year to an object called current_year.
 # b) Assign the year a hypothetical outbreak started to an object
-#    called outbreak_start (use any year you like).
-# c) Calculate how many years ago the outbreak started.
+#    called outbreak_start (use any past year you like).
+# c) Calculate how many years ago the outbreak started using the object
+#    you have just created.
 
-current_year  <- 2025
-outbreak_start <- 2019
-current_year - outbreak_start
+
 
 
 #---- Rules for naming R objects ----#
 
-# - No spaces          : attack rate  <- invalid | attack_rate <- valid
-# - Cannot start with a number : 1stCase <- invalid | case_1 <- valid
-# - Case-sensitive     : Cases and cases are different objects
+# - No spaces: 
+#      attack rate  - invalid
+#      attack_rate  - valid
+# - Cannot start with a number: 
+#      1stCase - invalid 
+#      case_1 - valid
+# - Case-sensitive: *Cases* and *cases* are different objects
 # - Avoid names of existing functions (e.g. do not use c, mean, sum)
 # - Use lowercase_with_underscores (recommended in epidemiology/tidyverse style)
 
@@ -134,9 +141,9 @@ current_year - outbreak_start
 case_ages <- c(4, 17, 23, 45, 67, 31, 8, 52)
 case_ages
 
-# Days from symptom onset to hospital admission (incubation proxy):
-days_to_admission <- c(2, 1, 3, 5, 2, 4, 1, 3)
-days_to_admission
+# Number of new cholera cases reported per district during the outbreak:
+weekly_cases <- c(104, 89, 132, 97, 76, 61)
+weekly_cases
 
 # --- Character vectors ---
 
@@ -164,10 +171,7 @@ hospitalised
 #    the district name for each week (make up six names).
 # c) Run both objects to confirm they are stored.
 
-weekly_cases <- c(104, 89, 132, 97, 76, 61)
 
-reporting_district <- c("District_A", "District_B", "District_C",
-                        "District_D", "District_E", "District_F")
 
 
 #---- Vectorised operations ----#
@@ -175,35 +179,52 @@ reporting_district <- c("District_A", "District_B", "District_C",
 # R applies arithmetic to every element of a vector at once.
 # This is called vectorisation and is one of R's great strengths.
 
-# Calculate the attack rate (%) if the population at risk is 500 per case:
-population_at_risk <- 500
-attack_rate <- (case_ages / population_at_risk) * 100
-# (illustrative only — using age as a stand-in count for demonstration)
+# --- Attack Rate ---
 
-# How many days over the threshold of 3?
-days_to_admission > 3
+# Attack rate (%) = (number of cases / population at risk) * 100
 
-# Sum of cases across all weeks:
+# Population at risk per district (one value per district,
+# matching the order of weekly_cases):
+population_at_risk <- c(850, 640, 1100, 720, 500, 430)
+
+# Calculate the attack rate for each district:
+attack_rate <- (weekly_cases / population_at_risk) * 100
+attack_rate
+# Each value tells us what percentage of the at-risk population
+# in that district became a case.
+
+# Which districts exceeded a 10% attack rate?
+attack_rate > 10
+
+# Which district index numbers exceeded a 10% attack rate?
+which(attack_rate > 10)
+
+# --- Summary statistics on case counts ---
+
+# Total cases across all districts:
 sum(weekly_cases)
 
-# Mean weekly cases:
+# Mean number of cases per district:
 mean(weekly_cases)
+
+# District with the highest and lowest case counts:
+max(weekly_cases)
+min(weekly_cases)
 
 # Exercise 4:
 # The case fatality rate (CFR) = (deaths / total cases) * 100
 # a) Using the case_outcome vector, count the number of deaths.
-#    Hint: sum(case_outcome == "died")
-# b) Calculate the CFR for the eight cases above.
+#    Hint: create a new object and store the *sum(case_outcome == "died")*
+# b) Calculate the total number of cases using length().
+#    Hint: create another object and store the *length(case_outcome).
+# c) Calculate the CFR and assign it to an object called CFR.
+# d) Interpret the result: what does this CFR tell you?
 
-deaths      <- sum(case_outcome == "died")
-total_cases <- length(case_outcome)
-CFR         <- (deaths / total_cases) * 100
-CFR
 
 
 #---- Indexing vectors ----#
 
-# Access specific elements using square brackets [].
+# Access or inspect specific elements using square brackets [].
 # R uses 1-based indexing (the first element is [1], not [0]).
 
 # Age of the first case:
@@ -219,14 +240,12 @@ case_ages[hospitalised]
 case_ages[-3]
 
 # Exercise 5:
-# a) Retrieve the weekly case count for week 3 from weekly_cases.
-# b) Retrieve weeks 4 to 6.
+# a) Retrieve the weekly case count number 3 from weekly_cases.
+# b) Retrieve weekly case count number 4 through 6.
 # c) Which week had more than 100 cases?
 #    Hint: weekly_cases > 100
 
-weekly_cases[3]
-weekly_cases[4:6]
-which(weekly_cases > 100)
+
 
 
 #---- Data frames: the core epidemiological data structure ----#
@@ -464,7 +483,7 @@ write.csv(linelist,
 # - How to detect and handle missing values (NA)
 # - How to save a cleaned data frame to .csv
 
-# In Part 2 we will import a real outbreak dataset, apply tidyverse
+# In Part 3 we will import a real outbreak dataset, apply tidyverse
 # cleaning functions (filter, mutate, select, case_when), and produce
 # summary tables and epidemic curves.
 

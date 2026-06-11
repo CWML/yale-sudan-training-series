@@ -30,7 +30,25 @@ Create an R Environment
 
 - If you get a message that says you are "in a project that hasn't been activated yet", choose option "1: Activate the project and use the project library" by entering "1" in the console.
 
-6.  Notice these files in your project directory: yale-sudan-training-series/ ├── .gitignore ← your root-level gitignore (from git init) ├── .Rprofile ├── renv.lock └── renv/ └── .gitignore ← renv's gitignore, scoped only to the renv/ folder └── activate.R └── settings.json └── library/
+6.  Notice these files in your project directory:
+
+    yale-sudan-training-series/
+
+    └── renv/
+
+    └── library/
+
+    └── .gitignore ← renv's gitignore, scoped only to the renv/ folder
+
+    └── activate.R
+
+    └── settings.json
+
+    ├── .gitignore ← your root-level gitignore (from git init)
+
+    ├── .Rprofile
+
+    ├── renv.lock
 
 - Now when this repository is cloned, renv::restore() will find the renv files you've created, and autoload the matching libraries.
 
@@ -46,25 +64,33 @@ Write a README file
 
 4.  Copy the text in the lines below (stop when you get to step 5) and paste at the top of your README.txt file (open in another window):
 
-This readme file was generated on \[YYYY-MM-DD\] by \[NAME\]
+This README file was generated on \[YYYY-MM-DD\] by \[NAME\]
 
-GENERAL INFORMATION
+# GENERAL INFORMATION
 
 Title of Dataset:
 
-Author/Principal Investigator Information
+## Author/Principal Investigator Information
 
-Name: ORCID: Institution: Address: Email:
+Name:
+
+ORCID:
+
+Institution:
+
+Address:
+
+Email:
 
 Date of data collection: provide single date, range, or approximate date; suggested format YYYY-MM-DD)
 
 Geographic location of data collection: provide latitude, longitude, or city/region, State, Country
 
-SHARING/ACCESS INFORMATION
+# SHARING/ACCESS INFORMATION
 
-DATA & FILE OVERVIEW
+# DATA & FILE OVERVIEW
 
-File List:
+## File List:
 
 This README template is a simplified version of Cornell's Readme Template for Data: https://ecommons.cornell.edu/entities/publication/6effe964-798e-4c21-aac2-4194709ff230
 

@@ -177,8 +177,4 @@ Example of what the data actually look like fo reach illness
 
 # Session 2 - Epidemiologic Measures, Tables, plots, & Maps
 
-<<<<<<< HEAD
-# Session 3 -Outbreak Detection, Modeling, Forecasting, and Reporting
-=======
-# Session 3 - Outbreak Detection, Modeling, Forecasting, and Reporting
->>>>>>> 827e908c84ca10e3922b15fbc2d19afa2567d4ee
+\<\<\<\<\<\<\< HEAD \# Session 3 -Outbreak Detection, Modeling, Forecasting, and Reporting ======= \# Session 3 - Outbreak Detection, Modeling, Forecasting, and Reporting \>\>\>\>\>\>\> 827e908c84ca10e3922b15fbc2d19afa2567d4ee
