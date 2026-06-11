@@ -16,19 +16,19 @@ Create an R Environment
 
 3.  Once you are in the directory you cloned, type renv::init(). This will check for any libraries you are missing and install them. It will also:
 
--   Create an renv/ folder
+- Create an renv/ folder
 
--   Create an renv.lock file
+- Create an renv.lock file
 
--   Create or update .gitignore to exclude the renv package cache
+- Create or update .gitignore to exclude the renv package cache
 
--   Snapshot any packages already detected in the project
+- Snapshot any packages already detected in the project
 
 4.  In the Console window, click the curved arrow icon to restart R
 
 5.  If you want to capture your environment, enter "renv::snapshot()" to record the package versions in your environment.
 
--   If you get a message that says you are "in a project that hasn't been activated yet", choose option "1: Activate the project and use the project library" by entering "1" in the console.
+- If you get a message that says you are "in a project that hasn't been activated yet", choose option "1: Activate the project and use the project library" by entering "1" in the console.
 
 6.  Notice these files in your project directory:
 
@@ -50,7 +50,7 @@ Create an R Environment
 
     ├── renv.lock
 
--   Now when this repository is cloned, renv::restore() will find the renv files you've created, and autoload the matching libraries.
+- Now when this repository is cloned, renv::restore() will find the renv files you've created, and autoload the matching libraries.
 
 ## EXERCISE 2
 
