@@ -462,9 +462,7 @@ cholera_linelist_clean <- cholera_linelist_raw %>%
 |                                                                                                                                                |
 | Please open **“Session 1: Tidyverse, importing data, data cleaning and validation_Exercise”**. Once it opens:                                  |
 |                                                                                                                                                |
-| 1.  Load the packages listed at the top of the file.                                                                                           |
-|                                                                                                                                                |
-| 2.  Complete **Step 2: Data Cleaning using the tidyverse**                                                                                     |
+| - Complete **Step 2: Data Cleaning using the tidyverse**                                                                                       |
 |                                                                                                                                                |
 | You can work on this together in your breakout room—talk through the steps and problem-solve as a group. You’ll have **20 minutes** to finish. |
 +------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -506,9 +504,7 @@ export(cholera_linelist_clean, here('processed_data', 'cholera_linelist_clean.xl
 |                                                                                                                                                |
 | Please open **“Session 1: Tidyverse, importing data, data cleaning and validation_Exercise”**. Once it opens:                                  |
 |                                                                                                                                                |
-| 1.  Load the packages listed at the top of the file.                                                                                           |
-|                                                                                                                                                |
-| 2.  Complete **Step 3: Reinspect the cleaned dataframe** and **Step 4: Exporting Cleaned Data**                                                |
+| - Complete **Step 3: Reinspect the cleaned dataframe** and **Step 4: Exporting Cleaned Data**                                                  |
 |                                                                                                                                                |
 | You can work on this together in your breakout room—talk through the steps and problem-solve as a group. You’ll have **15 minutes** to finish. |
 +------------------------------------------------------------------------------------------------------------------------------------------------+

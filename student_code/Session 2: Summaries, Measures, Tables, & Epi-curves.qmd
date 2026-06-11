@@ -128,7 +128,7 @@ table_one <- 1 %>%
 table_one
 ```
 
-# Step 6: Case Fatality Risk / Ratio (CFR)
+# Step 5: Case Fatality Risk / Ratio (CFR)
 
 Calculate the clinical severity of this outbreak using your case-only surveillance data.
 
@@ -142,7 +142,7 @@ Calculate the clinical severity of this outbreak using your case-only surveillan
 2.  The specific character string value inside that column representing an individual who died (e.g., "dead" or "death")
 3.  The variable you want to group by to look at regional differences
 
-## Step 6.1 Calculate the global CFR for the entire dataset
+## Step 5.1 Calculate the global CFR for the entire dataset
 
 ```{r}
 # Calculate global CFR for the entire dataset 
@@ -155,7 +155,7 @@ global_cfr <- 1 %>%
 global_cfr
 ```
 
-## Step 6.2 Calculate and compare the CFR across different states
+## Step 5.2 Calculate and compare the CFR across different states
 
 ```{r}
 # Calculate CFR by state
@@ -169,7 +169,7 @@ cfr_by_state <- 1 %>%
 cfr_by_state  
 ```
 
-# Step 7: Proportional Morbidity (Exposure Proportions)
+# Step 6: Proportional Morbidity (Exposure Proportions)
 
 Because surveillance officers frequently operate without population denominators or control groups, you must evaluate shifts in exposure trends purely among known cases.
 
@@ -183,7 +183,7 @@ Because surveillance officers frequently operate without population denominators
 2.  Date of symptom onset variable
 3.  Environmental risk factor/exposure variable name
 
-## Step 7.1 \# 1. Proportional Morbidity for Week 1 (Jan 1 - Jan 7, 2025)
+## Step 6.1 Proportional Morbidity for Week 1 (Jan 1 - Jan 7, 2025)
 
 ```{r}
 1 %>%
@@ -195,7 +195,7 @@ Because surveillance officers frequently operate without population denominators
   adorn_pct_formatting()
 ```
 
-## Step 7.2 Proportional Morbidity for the Late Phase (e.g., Feb 1 - Feb 7, 2025)
+## Step 6.2 Proportional Morbidity for the Late Phase (e.g., Feb 1 - Feb 7, 2025)
 
 **IMPORTANT: runt he code the first time then comment out the first date line and uncomment the second date line to compare the two weeks**
 
