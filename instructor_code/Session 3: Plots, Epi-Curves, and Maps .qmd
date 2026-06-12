@@ -9,13 +9,19 @@ editor: visual
 
 This session focuses on the visual and spatial dimensions of field epidemiology. Students will progress from exploratory continuous plotting to constructing advanced, publication-ready temporal and geographical models used to brief ministry leaders during an active emergency.
 
-| Aim | Tool / function |
-|---------------------------|---------------------------------------------|
++-----------------------------------------+------------------------------------------------+
+| Aim                                     | Tool / function                                |
++=========================================+================================================+
 | 1\. Construct stratified temporal plots | **ggplot2::geom_histogram()** & **geom_col()** |
-| 2\. Smooth operational artifacts | **slider::slide_index_dbl()** rolling curves |
-| 3\. Manage geospatial data vectors | **sf::st_as_sf()** & **sf::st_transform()** |
-| 4\. Defeat the "Choropleth Trap" | Population Denominator Standardization |
-| 5\. Deploy dynamic web visualizations | **plotly::ggplotly()** interactive widgets |
++-----------------------------------------+------------------------------------------------+
+| 2\. Smooth operational artifacts        | **slider::slide_index_dbl()** rolling curves   |
++-----------------------------------------+------------------------------------------------+
+| 3\. Manage geospatial data vectors      | **sf::st_as_sf()** & **sf::st_transform()**    |
++-----------------------------------------+------------------------------------------------+
+| 4\. Defeat the "Choropleth Trap"        | Population Denominator Standardization         |
++-----------------------------------------+------------------------------------------------+
+| 5\. Deploy dynamic web visualizations   | **plotly::ggplotly()** interactive widgets     |
++-----------------------------------------+------------------------------------------------+
 
 # Packages used for this session
 
@@ -94,6 +100,18 @@ ggplot(data = cholera_linelist, mapping = aes(x = onset_date)) +
        y = "Daily Case Incidences")
 ```
 
++------------------------------------------------------------------------------------------------------------------------------------------------+
+| Exercise Breakout                                                                                                                              |
++================================================================================================================================================+
+| We’ll pause for a short breakout exercise. You’ll be placed into breakout rooms now.                                                           |
+|                                                                                                                                                |
+| Please open **“Session 3: Plots, Epi-Curves, and Maps_Exercise”**. Once it opens:                                                              |
+|                                                                                                                                                |
+| - Complete **Step 1: Load and Prepare the Cleaned Data** and **Step 2: Constructing a Baseline Daily Epidemic Curve**                          |
+|                                                                                                                                                |
+| You can work on this together in your breakout room—talk through the steps and problem-solve as a group. You’ll have **20 minutes** to finish. |
++------------------------------------------------------------------------------------------------------------------------------------------------+
+
 ## Stratified Epidemic Curve (Weekly Aggregations)
 
 Extended outbreaks can generate excessive daily variance ("noise") due to reporting delays or weekend closure artifacts. Setting binwidth = 7 pools records into standard 7-day epidemiological blocks. Adding a fill parameter reveals geographic propagation patterns across states over time.
@@ -169,6 +187,18 @@ ggplot(data = cholera_linelist %>% filter(state_name == "Red Sea"), mapping = ae
   labs(title = "Outbreak Profile and Clinical Outcomes within Red Sea State", x = "Date of Symptom Onset", y = "Case Count", fill = "Patient Outcome") +
   theme_minimal()
 ```
+
++------------------------------------------------------------------------------------------------------------------------------------------------+
+| Exercise Breakout                                                                                                                              |
++================================================================================================================================================+
+| We’ll pause for a short breakout exercise. You’ll be placed into breakout rooms now.                                                           |
+|                                                                                                                                                |
+| Please open **“Session 3: Plots, Epi-Curves, and Maps_Exercise”**. Once it opens:                                                              |
+|                                                                                                                                                |
+| - Complete **Step 3: Stratified Weekly Facet Analysis** and **Step 4: Localized Deep Dive with a 7-Day Trailing Moving Average**               |
+|                                                                                                                                                |
+| You can work on this together in your breakout room—talk through the steps and problem-solve as a group. You’ll have **20 minutes** to finish. |
++------------------------------------------------------------------------------------------------------------------------------------------------+
 
 # Geographic Mapping: Visualizing Spatial Spread
 
@@ -392,23 +422,17 @@ sf_point_map <- ggplot() +
 ggplotly(sf_point_map, tooltip = "text")
 ```
 
-# Group Exercise
-
-**Time allowed:** 45-60 minutes
-
-Working in your assigned groups, you will apply these visual and spatial principles to your active team dataset: `dengue_linelist_2025_sudan.xlsx`.
-
-### Your Objectives
-
-- **Epidemic Curve Construction:** Open your group workspace and generate a baseline daily epidemic curve for the Dengue data. Then, pool the records into 7-day epidemiological blocks.
-
-- **Stratified Facet Analysis:** Facet your weekly epidemic curve by state name, mapping `serotype` to the fill aesthetic.
-
-- **Denominator-Standardized Mapping:** Load the provided Sudan administrative boundary maps. Match your states, join the regional baseline population metrics from today's lesson, and construct a standardized Dengue incidence map per 100,000 population. Contrast this with a raw count map.
-
-- **Interactive Dashboard Component:** Convert your point-source coordinate distribution data into an interactive `plotly` map. Ensure that when users hover over case coordinates, it clearly reports the patient's age, clinical outcome, and mosquito netting use status.
-
-Open `student_code / Session 3: Epi-Curves and Maps_Exercise.qmd` to begin. Be prepared to present your trendlines and standardized maps to the class during our wrap-up discussion!
++------------------------------------------------------------------------------------------------------------------------------------------------+
+| Exercise Breakout                                                                                                                              |
++================================================================================================================================================+
+| We’ll pause for a short breakout exercise. You’ll be placed into breakout rooms now.                                                           |
+|                                                                                                                                                |
+| Please open **“Session 3: Plots, Epi-Curves, and Maps_Exercise”**. Once it opens:                                                              |
+|                                                                                                                                                |
+| - Complete **Step 5: Denominator-Standardized Mapping** and **Step 6: Interactive Dashboard Point Map Component**                              |
+|                                                                                                                                                |
+| You can work on this together in your breakout room—talk through the steps and problem-solve as a group. You’ll have **20 minutes** to finish. |
++------------------------------------------------------------------------------------------------------------------------------------------------+
 
 # Resources
 

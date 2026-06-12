@@ -103,7 +103,7 @@ cholera_linelist %>%
 +================================================================================================================================================+
 | We’ll pause for a short breakout exercise. You’ll be placed into breakout rooms now.                                                           |
 |                                                                                                                                                |
-| Please open **“Session 1: Tidyverse, importing data, data cleaning and validation_Exercise”**. Once it opens:                                  |
+| Please open **“Session 2: Summaries, Measures, Tables, & Epi-curves_Exercise”**. Once it opens:                                                |
 |                                                                                                                                                |
 | 1.  Load the packages listed at the top of the file.                                                                                           |
 |                                                                                                                                                |
@@ -281,7 +281,7 @@ cholera_linelist %>%
 +================================================================================================================================================+
 | We’ll pause for a short breakout exercise. You’ll be placed into breakout rooms now.                                                           |
 |                                                                                                                                                |
-| Please open **“Session 1: Tidyverse, importing data, data cleaning and validation_Exercise”**. Once it opens:                                  |
+| Please open **“Session 2: Summaries, Measures, Tables, & Epi-curves_Exercise”**. Once it opens:                                                |
 |                                                                                                                                                |
 | - Complete **Step 3: Summary Statistics & Simple Hypothesis Testing**                                                                          |
 |                                                                                                                                                |
@@ -349,7 +349,7 @@ tbl1
 +================================================================================================================================================+
 | We’ll pause for a short breakout exercise. You’ll be placed into breakout rooms now.                                                           |
 |                                                                                                                                                |
-| Please open **“Session 1: Tidyverse, importing data, data cleaning and validation_Exercise”**. Once it opens:                                  |
+| Please open **“Session 2: Summaries, Measures, Tables, & Epi-curves_Exercise”**. Once it opens:                                                |
 |                                                                                                                                                |
 | - Complete **Step 4: Constructing a Publication-Ready "Table 1"**                                                                              |
 |                                                                                                                                                |
@@ -396,7 +396,7 @@ cholera_linelist %>%
 +================================================================================================================================================+
 | We’ll pause for a short breakout exercise. You’ll be placed into breakout rooms now.                                                           |
 |                                                                                                                                                |
-| Please open **“Session 1: Tidyverse, importing data, data cleaning and validation_Exercise”**. Once it opens:                                  |
+| Please open **“Session 2: Summaries, Measures, Tables, & Epi-curves_Exercise”**. Once it opens:                                                |
 |                                                                                                                                                |
 | - Complete **Step 5: Case Fatality Risk / Ratio (CFR)** and **Step 6: Proportional Morbidity (Exposure Proportions)**                          |
 |                                                                                                                                                |

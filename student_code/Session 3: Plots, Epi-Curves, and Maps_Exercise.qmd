@@ -1,5 +1,5 @@
 ---
-title: "Session 3: Advanced Epidemic Curves & Spatial Mapping_Exercise"
+title: "Session 3: Plots, Epi-Curves, and Maps "
 author: "Max Wegener"
 format: html
 editor: visual
@@ -209,7 +209,7 @@ ggplot(dengue_map_df) +
   theme_minimal()
 ```
 
-## \## Step 6: Interactive Dashboard Point Map Component
+## Step 6: Interactive Dashboard Point Map Component
 
 Bypass political boundaries by plotting precise coordinate intersections. Convert a static point distribution into a dynamic, hover-responsive map tracking local vector controls.
 
