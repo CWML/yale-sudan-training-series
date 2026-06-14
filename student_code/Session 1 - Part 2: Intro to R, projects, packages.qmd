@@ -1,5 +1,6 @@
 ---
-title: "Session 1: Intro to R, project management"
+title: Session 1 - Introduction to Programming in R for Epidemiology
+subtitle: Part 2 - Intro to R, project management
 format: html
 editor: visual
 ---

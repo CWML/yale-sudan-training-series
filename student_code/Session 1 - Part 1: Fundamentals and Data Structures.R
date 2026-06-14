@@ -141,7 +141,11 @@ paste("Outbreak location:", location)
 case_ages <- c(4, 17, 23, 45, 67, 31, 8, 52)
 case_ages
 
-# Number of new cholera cases reported per district during the outbreak:
+# Days from symptom onset to hospital admission:
+days_to_admission <- c(2, 1, 3, 5, 2, 4, 1, 3)
+days_to_admission
+
+# Number of new cholera cases reported per district:
 weekly_cases <- c(104, 89, 132, 97, 76, 61)
 weekly_cases
 
@@ -164,12 +168,13 @@ hospitalised <- c(TRUE, FALSE, TRUE, TRUE, FALSE, TRUE, FALSE, TRUE)
 hospitalised
 
 # Exercise 3:
-# a) Create a numeric vector called weekly_cases containing the
-#    number of new cholera cases reported over 6 weeks:
-#    104, 89, 132, 97, 76, 61
+# a) Create a numeric vector called district_cases containing the
+#    number of new cholera cases reported in six new districts:
+#    45, 78, 23, 110, 65, 90
 # b) Create a character vector called reporting_district with
-#    the district name for each week (make up six names).
+#    the district name for each entry (make up six names).
 # c) Run both objects to confirm they are stored.
+# d) What is the difference between district_cases and weekly_cases?
 
 
 
@@ -302,9 +307,7 @@ summary(linelist)
 #    Hint: typeof(linelist$outcome)
 # c) What is the mean age of cases?
 
-dim(linelist)
-typeof(linelist$outcome)
-mean(linelist$age)
+
 
 
 #---- Accessing columns with $ ----#
@@ -350,9 +353,7 @@ linelist[1:3, "outcome"]
 # b) Retrieve the age and outcome columns for all cases.
 # c) Retrieve the sex and outcome of cases 2, 4, and 6.
 
-linelist[5, ]
-linelist[, c("age", "outcome")]
-linelist[c(2, 4, 6), c("sex", "outcome")]
+
 
 
 #---- Filtering rows by condition ----#
@@ -385,9 +386,6 @@ linelist[linelist$hospitalised == FALSE, ]
 # b) Filter to show cases where days_to_admit is greater than 2.
 # c) Filter to show hospitalised female cases only.
 
-linelist[linelist$sex == "female", ]
-linelist[linelist$days_to_admit > 2, ]
-linelist[linelist$hospitalised == TRUE & linelist$sex == "female", ]
 
 
 #---- Adding and modifying columns ----#
@@ -401,7 +399,7 @@ linelist$age_group <- ifelse(linelist$age < 18, "paediatric", "adult")
 linelist
 
 # The ifelse() function evaluates a condition for every row:
-#   ifelse(test, value_if_TRUE, value_if_FALSE)
+#   ifelse(test, value_if_TRUE, value_if_FALSE), similar to IF() in Excel.
 
 # Create a binary numeric column for deaths (1 = died, 0 = recovered):
 linelist$died <- ifelse(linelist$outcome == "died", 1, 0)
@@ -413,7 +411,7 @@ linelist
 #    and FALSE otherwise.
 # b) Add a column called case_label that pastes "Case" and case_id
 #    together (e.g. "Case 1", "Case 2", ...).
-#    Hint: paste("Case", linelist$case_id)
+#    Hint: paste("Case", linelist$case_id), similar to the function CONCATENATE() in excel
 
 linelist$severe      <- ifelse(linelist$days_to_admit >= 4, TRUE, FALSE)
 linelist$case_label  <- paste("Case", linelist$case_id)
@@ -483,9 +481,17 @@ write.csv(linelist,
 # - How to detect and handle missing values (NA)
 # - How to save a cleaned data frame to .csv
 
-# In Part 3 we will import a real outbreak dataset, apply tidyverse
-# cleaning functions (filter, mutate, select, case_when), and produce
-# summary tables and epidemic curves.
+# ---- What comes next ----#
+#
+# In Part 2, Levi will cover project management for reproducible research:
+# setting up an R environment with renv, exploring the project folder
+# structure with fs::dir_tree(), and writing a README file to document
+# your work for future collaborators.
+#
+# In Part 3, we will import a real outbreak dataset and learn how to write
+# more efficient and reproducible code by applying tidyverse functions
+# to clean and reshape the data, produce summary tables, and generate
+# epidemic curves.
 
 # ============================================================
 # End of script
