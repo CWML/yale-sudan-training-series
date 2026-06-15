@@ -54,26 +54,26 @@ Any number within quotations or asterisks (\*) the appropriate names/labels shou
 9.  New column name for age group variable
 10. New value to replace blanks and NAs in character columns
 
-- Start by updating the name of the DF to "dengue_linelist_clean*"*
+-   Start by updating the name of the DF to "dengue_linelist_clean*"*
 
-- Clean the column names
+-   Clean the column names
 
-- Convert date columns from POSIXct to an R Date
+-   Convert date columns from POSIXct to an R Date
 
-- Rename columns to be more descriptive
+-   Rename columns to be more descriptive
 
-  | Old Name     | New Name        |
-  |--------------|-----------------|
-  | `date_onset` | `onset_date`    |
-  | `lat`        | `latitiude`     |
-  | `lon`        | `longitutde`    |
-  | `days_hosp`  | `hospital_days` |
+    | Old Name     | New Name        |
+    |--------------|-----------------|
+    | `date_onset` | `onset_date`    |
+    | `lat`        | `latitiude`     |
+    | `lon`        | `longitutde`    |
+    | `days_hosp`  | `hospital_days` |
 
-- Standardize messy state name values into clean, consistent categories
+-   Standardize messy state name values into clean, consistent categories
 
-- Change blanks or NA values to "unknown"
+-   Change blanks or NA values to "unknown"
 
-- Select only the variables we need for analysis and arrange them
+-   Select only the variables we need for analysis and arrange them
 
 ```{r}
 #add cleaning code chunk here

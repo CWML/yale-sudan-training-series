@@ -44,9 +44,9 @@ dengue_linelist <- import(here("processed_data", "dengue_linelist_clean.xlsx")) 
 
 Using ggplot2 and geom_histogram(), construct a daily epidemic curve tracking the progression of this Dengue outbreak.
 
-- Set the bars to represent daily increments (binwidth = 1).
+-   Set the bars to represent daily increments (binwidth = 1).
 
-- Use a clear, distinct border and fill color for the bars.
+-   Use a clear, distinct border and fill color for the bars.
 
 ```{r}
 # Generate the baseline daily epidemic curve
@@ -58,11 +58,11 @@ Using ggplot2 and geom_histogram(), construct a daily epidemic curve tracking th
 
 Daily charts can sometimes mask wide-scale transmission velocities. Let's aggregate our temporal records into standard 7-day blocks and review regional patterns.
 
-- Set the histogram to pool data into weekly increments.
+-   Set the histogram to pool data into weekly increments.
 
-- Map the Dengue virus serotype variable to the fill aesthetic.
+-   Map the Dengue virus serotype variable to the fill aesthetic.
 
-- Use facet_wrap() to generate separate timelines for each state_name.
+-   Use facet_wrap() to generate separate timelines for each state_name.
 
 ```{r}
 # Generate the facetted weekly epidemic curve stratified by Dengue serotype
@@ -77,13 +77,13 @@ Identify the highest-burden state from your facetted plot. We will construct an 
 
 **Hint: Find the placeholders (.A. and .B. and .C. and .D.) in the code chunk below and replace them with the appropriate items:**
 
-- .A. Dataframe name
+-   .A. Dataframe name
 
-- .B. The specific high-burden state string value to filter by (e.g., "Red Sea")
+-   .B. The specific high-burden state string value to filter by (e.g., "Red Sea")
 
-- .C. Date of symptom onset variable name
+-   .C. Date of symptom onset variable name
 
-- .D. Categorical variable name tracking clinical status (e.g., "outcome")
+-   .D. Categorical variable name tracking clinical status (e.g., "outcome")
 
 ```{r}
 # 1. Prepare data aggregated by epidemiological week for the selected state
@@ -132,19 +132,19 @@ ggplot(data = dengue_weekly_trends) +
 
 To target vector-control resources effectively, we must calculate population-adjusted incidence rates rather than mapping raw case counts (avoiding the "Choropleth Trap").
 
-- Load the provided sudan_adm1 spatial object.
+-   Load the provided sudan_adm1 spatial object.
 
-- Recode unmatched string characters (e.g., "Southern Darfur" to "South Darfur").
+-   Recode unmatched string characters (e.g., "Southern Darfur" to "South Darfur").
 
-- Join the 18-state population matrix to establish proper risk denominators.
+-   Join the 18-state population matrix to establish proper risk denominators.
 
 **Hint: Find the placeholders (.A. and .B. and .C.) in the code chunk below and replace them with the appropriate items:**
 
-- .A. The original shapefile object name containing administrative boundaries
+-   .A. The original shapefile object name containing administrative boundaries
 
-- .B. The population reference dataframe containing baseline denominators
+-   .B. The population reference dataframe containing baseline denominators
 
-- .C. The specific mathematical variable calculation for population standardization
+-   .C. The specific mathematical variable calculation for population standardization
 
 ```{r}
 # 1. Establish validated national population matrix for Sudan (All 18 States)
@@ -215,15 +215,15 @@ Bypass political boundaries by plotting precise coordinate intersections. Conver
 
 **Hint: Find the placeholders (.A., .B., .C., .D., and .E.) in the code chunk below and replace them with the appropriate items:**
 
-- **.A.** Call the correct dataframe we have been working with in this exercise.
+-   **.A.** Call the correct dataframe we have been working with in this exercise.
 
-- **.B.** Add the longitude variable name.
+-   **.B.** Add the longitude variable name.
 
-- **.C.** Add the latitude variable name.
+-   **.C.** Add the latitude variable name.
 
-- **.D.** Provide the name of the new spatial dataset (`sf` object) we created in part 1.
+-   **.D.** Provide the name of the new spatial dataset (`sf` object) we created in part 1.
 
-- **.E.** Add the categorical variable name we want to color-code our points by (e.g., tracking patient status).
+-   **.E.** Add the categorical variable name we want to color-code our points by (e.g., tracking patient status).
 
 ```{r}
 # 1. Extract valid points and assign spatial coordinates
