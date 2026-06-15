@@ -7,5 +7,4 @@
 **/Notes/
 
 # Ignore auto-generated folder outputs from R Markdown / Quarto
-*_files/
 *_cache/.DS_Store
