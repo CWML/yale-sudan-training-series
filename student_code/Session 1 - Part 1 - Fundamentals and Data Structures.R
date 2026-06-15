@@ -32,6 +32,9 @@
 #
 # The code will run in the Console
 
+# fro more detaisl on Positron, see the official documentation:
+# https://posit.co/docs/positron/getting-started/overview/
+
 #---- Setting up your working directory ----#
 
 # Check where R is currently looking for files:
