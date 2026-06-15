@@ -67,13 +67,13 @@ An Epidemic Curve (Epi-curve) is a visual histogram of an outbreak that plots th
 
 An epi-curve provides essential visual clues about the outbreak's magnitude, outliers, time trends, and primary mode of transmission: Point Source:
 
-- A common source exposure where the transmission window is brief and all cases cluster within a single incubation period.
+-   A common source exposure where the transmission window is brief and all cases cluster within a single incubation period.
 
-  - **Continuous Common Source**: Exposure is prolonged or persistent, causing cases to rise gradually and form a plateau rather than a sharp peak.
+    -   **Continuous Common Source**: Exposure is prolonged or persistent, causing cases to rise gradually and form a plateau rather than a sharp peak.
 
-  - **Intermittent Common Source:** Exposure occurs sporadically, producing irregular, jagged peaks reflecting the timing of the vehicle's availability.
+    -   **Intermittent Common Source:** Exposure occurs sporadically, producing irregular, jagged peaks reflecting the timing of the vehicle's availability.
 
-- **Propagated Outbreak:** Spread person-to-person. These epidemics display progressively taller, compounding waves spaced roughly one incubation period apart.
+-   **Propagated Outbreak:** Spread person-to-person. These epidemics display progressively taller, compounding waves spaced roughly one incubation period apart.
 
 ## Basic Data Visualization: Understanding Age Distribution
 
@@ -107,7 +107,7 @@ ggplot(data = cholera_linelist, mapping = aes(x = onset_date)) +
 |                                                                                                                                                |
 | Please open **“Session 3: Plots, Epi-Curves, and Maps_Exercise”**. Once it opens:                                                              |
 |                                                                                                                                                |
-| - Complete **Step 1: Load and Prepare the Cleaned Data** and **Step 2: Constructing a Baseline Daily Epidemic Curve**                          |
+| -   Complete **Step 1: Load and Prepare the Cleaned Data** and **Step 2: Constructing a Baseline Daily Epidemic Curve**                        |
 |                                                                                                                                                |
 | You can work on this together in your breakout room—talk through the steps and problem-solve as a group. You’ll have **20 minutes** to finish. |
 +------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -195,7 +195,7 @@ ggplot(data = cholera_linelist %>% filter(state_name == "Red Sea"), mapping = ae
 |                                                                                                                                                |
 | Please open **“Session 3: Plots, Epi-Curves, and Maps_Exercise”**. Once it opens:                                                              |
 |                                                                                                                                                |
-| - Complete **Step 3: Stratified Weekly Facet Analysis** and **Step 4: Localized Deep Dive with a 7-Day Trailing Moving Average**               |
+| -   Complete **Step 3: Stratified Weekly Facet Analysis** and **Step 4: Localized Deep Dive with a 7-Day Trailing Moving Average**             |
 |                                                                                                                                                |
 | You can work on this together in your breakout room—talk through the steps and problem-solve as a group. You’ll have **20 minutes** to finish. |
 +------------------------------------------------------------------------------------------------------------------------------------------------+
@@ -429,23 +429,23 @@ ggplotly(sf_point_map, tooltip = "text")
 |                                                                                                                                                |
 | Please open **“Session 3: Plots, Epi-Curves, and Maps_Exercise”**. Once it opens:                                                              |
 |                                                                                                                                                |
-| - Complete **Step 5: Denominator-Standardized Mapping** and **Step 6: Interactive Dashboard Point Map Component**                              |
+| -   Complete **Step 5: Denominator-Standardized Mapping** and **Step 6: Interactive Dashboard Point Map Component**                            |
 |                                                                                                                                                |
 | You can work on this together in your breakout room—talk through the steps and problem-solve as a group. You’ll have **20 minutes** to finish. |
 +------------------------------------------------------------------------------------------------------------------------------------------------+
 
 # Resources
 
-- [**The Epidemiologist R Handbook**](https://epirhandbook.com/en/) The definitive, open-access reference manual for applied public health and field epidemiology in R. Excellent for step-by-step guidance on outbreak data cleaning, epi-curves, and contact tracing pipelines.
+-   [**The Epidemiologist R Handbook**](https://epirhandbook.com/en/) The definitive, open-access reference manual for applied public health and field epidemiology in R. Excellent for step-by-step guidance on outbreak data cleaning, epi-curves, and contact tracing pipelines.
 
-- [**NCIPH FOCUS: Understanding and Creating Epidemic Curves**](https://nciph.sph.unc.edu/focus/vol1/issue5/1-5EpiCurves_issue.pdf) A foundational guide from the North Carolina Center for Public Health Preparedness. Essential reading for understanding how incubation periods, transmission modes, and data intervals dictate the shape of an epi-curve.
+-   [**NCIPH FOCUS: Understanding and Creating Epidemic Curves**](https://nciph.sph.unc.edu/focus/vol1/issue5/1-5EpiCurves_issue.pdf) A foundational guide from the North Carolina Center for Public Health Preparedness. Essential reading for understanding how incubation periods, transmission modes, and data intervals dictate the shape of an epi-curve.
 
-- [**R Programming for Data Science**](https://bookdown.org/rdpeng/rprogdatascience/) Roger D. Peng’s deep dive into the foundational mechanics of the R language, data types, scoping rules, and functional programming configurations.
+-   [**R Programming for Data Science**](https://bookdown.org/rdpeng/rprogdatascience/) Roger D. Peng’s deep dive into the foundational mechanics of the R language, data types, scoping rules, and functional programming configurations.
 
-- [**Efficient R Programming**](https://csgillespie.github.io/efficientR/) A masterclass by Colin Gillespie and Robin Lovelace on optimizing R code performance. Great for learning how to handle large surveillance datasets, memory profiling, and pipeline acceleration.
+-   [**Efficient R Programming**](https://csgillespie.github.io/efficientR/) A masterclass by Colin Gillespie and Robin Lovelace on optimizing R code performance. Great for learning how to handle large surveillance datasets, memory profiling, and pipeline acceleration.
 
-- [**Hands-On Programming with R (HOPR)**](https://rstudio-education.github.io/hopr/) Garrett Grolemund’s user-friendly introduction to data science basics. Highly recommended for absolute beginners in the class who need practice with basic data structures, vectors, and loops.
+-   [**Hands-On Programming with R (HOPR)**](https://rstudio-education.github.io/hopr/) Garrett Grolemund’s user-friendly introduction to data science basics. Highly recommended for absolute beginners in the class who need practice with basic data structures, vectors, and loops.
 
-- [**R for Data Science (R4DS)**](https://r4ds.had.co.nz/) The industry-standard text by Hadley Wickham and Garrett Grolemund focusing on the `tidyverse` ecosystem. This is the core reference for data transformation with `dplyr`, reshaping with `tidyr`, and programmatic plotting with `ggplot2`.
+-   [**R for Data Science (R4DS)**](https://r4ds.had.co.nz/) The industry-standard text by Hadley Wickham and Garrett Grolemund focusing on the `tidyverse` ecosystem. This is the core reference for data transformation with `dplyr`, reshaping with `tidyr`, and programmatic plotting with `ggplot2`.
 
-- [**Shiny by Posit**](https://shiny.posit.co)– The official Shiny homepage, with tutorials, galleries, and documentation for building interactive web applications in R.
+-   [**Shiny by Posit**](https://shiny.posit.co)– The official Shiny homepage, with tutorials, galleries, and documentation for building interactive web applications in R.

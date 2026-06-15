@@ -10,17 +10,12 @@ editor: visual
 This session extends the data-cleaning skills from Session 1 into basic outbreak epidemiology and spatial visualisation.\
 Skills you will practice:
 
-+--------------------------------------+---------------------------------------------------------------+
-| Aim                                  | Tool / function                                               |
-+======================================+===============================================================+
-| 1\. Produce clean descriptive tables | **janitor::tabyl()**, **gtsummary**, **dplyr::count()**       |
-+--------------------------------------+---------------------------------------------------------------+
-| 2\. Compute measures of association  | 2×2 tables ➜ **epitools::oddsratio()** & **epiR::epi.2by2()** |
-+--------------------------------------+---------------------------------------------------------------+
-| 3\. Calculate attack rates           | **dplyr** pipelines                                           |
-+--------------------------------------+---------------------------------------------------------------+
-| 4\. Draw an epidemic curve           | **ggplot2**                                                   |
-+--------------------------------------+---------------------------------------------------------------+
+| Aim | Tool / function |
+|--------------------------|----------------------------------------------|
+| 1\. Produce clean descriptive tables | **janitor::tabyl()**, **gtsummary**, **dplyr::count()** |
+| 2\. Compute measures of association | 2×2 tables ➜ **epitools::oddsratio()** & **epiR::epi.2by2()** |
+| 3\. Calculate attack rates | **dplyr** pipelines |
+| 4\. Draw an epidemic curve | **ggplot2** |
 
 # Packages used for this session
 
@@ -97,20 +92,6 @@ cholera_linelist %>%
         adorn_pct_formatting(digits = 1) %>% 
         adorn_ns(position = "front")
 ```
-
-+------------------------------------------------------------------------------------------------------------------------------------------------+
-| Exercise Breakout                                                                                                                              |
-+================================================================================================================================================+
-| We’ll pause for a short breakout exercise. You’ll be placed into breakout rooms now.                                                           |
-|                                                                                                                                                |
-| Please open **“Session 2: Summaries, Measures, Tables, & Epi-curves_Exercise”**. Once it opens:                                                |
-|                                                                                                                                                |
-| 1.  Load the packages listed at the top of the file.                                                                                           |
-|                                                                                                                                                |
-| 2.  Complete **Step 1: Load the Cleaned Data** and **Step 2: Descriptive Frequency Tables**                                                    |
-|                                                                                                                                                |
-| You can work on this together in your breakout room—talk through the steps and problem-solve as a group. You’ll have **10 minutes** to finish. |
-+------------------------------------------------------------------------------------------------------------------------------------------------+
 
 # Summary statistics for numeric variables using get_summary_stats within the statix package
 
@@ -276,18 +257,6 @@ cholera_linelist %>%
   bold_labels()
 ```
 
-+------------------------------------------------------------------------------------------------------------------------------------------------+
-| Exercise Breakout                                                                                                                              |
-+================================================================================================================================================+
-| We’ll pause for a short breakout exercise. You’ll be placed into breakout rooms now.                                                           |
-|                                                                                                                                                |
-| Please open **“Session 2: Summaries, Measures, Tables, & Epi-curves_Exercise”**. Once it opens:                                                |
-|                                                                                                                                                |
-| - Complete **Step 3: Summary Statistics & Simple Hypothesis Testing**                                                                          |
-|                                                                                                                                                |
-| You can work on this together in your breakout room—talk through the steps and problem-solve as a group. You’ll have **10 minutes** to finish. |
-+------------------------------------------------------------------------------------------------------------------------------------------------+
-
 ## Table 1: Comprehensive Baseline Characteristics Table
 
 In epidemiological publications and outbreak reports, "Table 1" is the standard layout used to summarize all recorded demographic, spatial, and clinical variables within a single comprehensive table, stratified by a key variable like clinical outcome.
@@ -344,18 +313,6 @@ add_p(
 tbl1
 ```
 
-+------------------------------------------------------------------------------------------------------------------------------------------------+
-| Exercise Breakout                                                                                                                              |
-+================================================================================================================================================+
-| We’ll pause for a short breakout exercise. You’ll be placed into breakout rooms now.                                                           |
-|                                                                                                                                                |
-| Please open **“Session 2: Summaries, Measures, Tables, & Epi-curves_Exercise”**. Once it opens:                                                |
-|                                                                                                                                                |
-| - Complete **Step 4: Constructing a Publication-Ready "Table 1"**                                                                              |
-|                                                                                                                                                |
-| You can work on this together in your breakout room—talk through the steps and problem-solve as a group. You’ll have **15 minutes** to finish. |
-+------------------------------------------------------------------------------------------------------------------------------------------------+
-
 # Common epidemiological measures used for case-only data
 
 ## Case Fatality Risk / Ratio (CFR)
@@ -391,14 +348,26 @@ cholera_linelist %>%
   adorn_pct_formatting()
 ```
 
-+------------------------------------------------------------------------------------------------------------------------------------------------+
-| Exercise Breakout                                                                                                                              |
-+================================================================================================================================================+
-| We’ll pause for a short breakout exercise. You’ll be placed into breakout rooms now.                                                           |
-|                                                                                                                                                |
-| Please open **“Session 2: Summaries, Measures, Tables, & Epi-curves_Exercise”**. Once it opens:                                                |
-|                                                                                                                                                |
-| - Complete **Step 5: Case Fatality Risk / Ratio (CFR)** and **Step 6: Proportional Morbidity (Exposure Proportions)**                          |
-|                                                                                                                                                |
-| You can work on this together in your breakout room—talk through the steps and problem-solve as a group. You’ll have **20 minutes** to finish. |
-+------------------------------------------------------------------------------------------------------------------------------------------------+
+# Group Exercise
+
+Time allowed: 45 minutes
+
+Working in your assigned groups of 4 or 5, you will apply the analytical principles practiced above to a different epidemiological dataset: dengue_linelist_2025_sudan.xlsx.
+
+Your Objectives:
+
+-   **Data Import & Prep:** Open your group workspace folder, locate the spreadsheet inside processed_data, and verify that the symptom onset date variable is explicitly parsed as a Date object.
+
+-   **Descriptive Tables:** Generate a frequency table of dengue cases by state. Create a 2-way table looking at patient sex against clinical outcomes.
+
+-   **Statistical Testing:** Investigate whether there is a significant difference in age between dengue cases who recovered versus those who were hospitalised or died. Pick the correct parametric or non-parametric test based on the age distribution.
+
+-   **Table 1 Production:** Use {gtsummary} to assemble a formatted baseline characteristics table stratified by patient state.
+
+-   **Case-Only Surveillance Metrics:**
+
+    -   Calculate the global Case Fatality Risk (CFR) for this dengue outbreak. Then, calculate and compare the CFR across different states to see where clinical outcomes are most severe.
+
+    -   Calcualte the Proportional Morbidity and use date-filtering to calculate the proportion of cases reporting a specific exposure (e.g., presence of open water storage containers) during the first week of the outbreak versus the final week of data. Did the primary exposure profile shift?
+
+Navigate to your group's folder, open student_code / Session 2: Summaries, Measures, Tables, & Epi-curves.qmd, and complete the exercises. Be ready to share your code and data visualizations with the class during the wrap-up discussion!
