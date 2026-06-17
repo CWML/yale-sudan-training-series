@@ -162,8 +162,7 @@ To test your new spell checker, try typing a word in Arabic, and then deliberate
 
 ## EXERCISE 4
 
-Add Arabic to plots in R.
-(R's default graphics engine uses system fonts, and may not render Arabic correctly in plots. the showtext package fixes this if we add Arabic fonts)
+Add Arabic to plots in R. (R's default graphics engine uses system fonts, and may not render Arabic correctly in plots. the showtext package fixes this if we add Arabic fonts)
 
 ```{r}
 install.packages("showtext") 
@@ -187,12 +186,19 @@ If you are having difficulty with installing packages in your environment, or if
 
 1.  Search for the package on GitHub. Then go into the files, find the function that you are looking for, and copy and paste it into your code. (many GitHub repositories for R packages also have helpful Cheat Sheets and README files which can help you learn what they do. For example: https://github.com/tidyverse)
 
-2.  If a colleague has successfully installed the package on their machine, they can enter the name of the function into the console to get all or part of the code for it. This can also be used to search for the matching function in GitHub, or copied into your script. (to see what this might look like, try entering Reduce into the console and seeing what you get. This is a base R function.)
+2.  To help find a function in a repository, you can ask an AI assistant to help you:
 
-3.  Be aware that some function names exist in more than one package. For example, filter() exists in both dplyr and base R (stats). When copying a function from a package, check whether the same name is already used elsewhere in your script. To be safe, you can always call functions explicitly using the :: syntax:
+    -   Go to the GitHub file
+    -   Click Raw in the top right
+    -   Select all, copy
+    -   Paste into the chat with a prompt like: **Here is the source code from the dplyr package. Can you find the filter() function, show the code, and explain what each part does in simple terms?**
+
+3.  If a colleague has successfully installed the package on their machine, they can enter the name of the function into the console to get all or part of the code for it. This can also be used to search for the matching function in GitHub, or copied into your script. (to see what this might look like, try entering Reduce into the console and seeing what you get. This is a base R function.)
+
+4.  Be aware that some function names exist in more than one package. For example, filter() exists in both dplyr and base R (stats). When copying a function from a package, check whether the same name is already used elsewhere in your script. To be safe, you can always call functions explicitly using the :: syntax:
 
     dplyr::filter() stats::filter()
 
-4.  Before copying a function into your script, check whether it calls other functions from the same package internally. If it does, you may need to copy those too, or the function will not run. You can spot these as function calls that don't look like base R — for example, calls to rlang:: or vctrs:: inside tidyverse functions. A function that only calls base R functions internally is the safest to copy.
+5.  Before copying a function into your script, check whether it calls other functions from the same package internally. If it does, you may need to copy those too, or the function will not run. You can spot these as function calls that don't look like base R — for example, calls to rlang:: or vctrs:: inside tidyverse functions. A function that only calls base R functions internally is the safest to copy.
 
 Note: copying individual functions works best for simple, self-contained functions. Complex functions from tidyverse packages often call other internal functions underneath, which means a full copy may require more than one function to work correctly.
