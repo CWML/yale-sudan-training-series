@@ -97,3 +97,81 @@ Geographic location of data collection: provide latitude, longitude, or city/reg
 This README template is a simplified version of Cornell's Readme Template for Data: https://ecommons.cornell.edu/entities/publication/6effe964-798e-4c21-aac2-4194709ff230
 
 5.  Optional: in your README.txt file, write a short description next to these folders: - raw_data (original data goes here) - processed data (clean data goes here) - scripts (code to for analyses goes here) - outputs (analyses outputs go here)
+
+# Using Arabic in R
+
+Arabic can be used in R scripts in Positron when you are doing things like reading from a file or creating variables. The same best practices for file naming as in English apply: Start names with letters, not numbers; connect words with underscores, not spaces. For example:
+
+```{r}
+
+df <- read.csv("raw_data/cholera_surveillance_ar.csv",
+               fileEncoding = "UTF-8-BOM",
+               stringsAsFactors = FALSE)
+
+# Check structure
+head(df)
+str(df)
+
+# What age groups are present?
+unique(df$الفئة_العمرية) #age_group
+
+# Only confirmed cases
+مؤكد <- df[df$تصنيف_الحالة == "مؤكد", ] #case_classification == "confirmed"
+
+```
+
+## EXERCISE 3
+
+Add an Arabic spell checker to the Positron environment.
+
+1.  Go to the blue menu on the far left side of Positron, and click the Extensions icon (if you hover you will see the name - it looks like four squares).
+
+2.  You should now see the "Extensions Marketplace" in the Explorer window. In the search bar, enter "Arabic"
+
+3.  Click on "Arabic - Code Spell Checker". Check to for a blue check mark underneath, and in the installation window check that the identifier matches this:\
+    **streetsidesoftware.code-spell-checker-arabic**
+
+4.  Click "install"
+
+5.  Next, to enable the spell checker, go to the gear icon (lower left) in the blue left-hand side menu. Click this and then select Settings from the menu that appears.
+
+6.  In the "Search settings" bar, type "cspell"
+
+7.  Select "Languages and Dictionaries" (underneath "Code Spell Checker")
+
+8.  Click the "Edit as JSON" button in the upper right of the settings window.
+
+9.  Change the JSON file to look like this:
+
+    ```         
+    // Settings imported from Visual Studio Code
+    {
+        "files.associations": {
+            "renv.lock": "json"
+        },
+        "cSpell.languageSettings": [
+
+        ],
+        "cSpell.language": "en,ar"
+    }
+    ```
+
+You can copy and paste, or add the **"cSpell.language": "en,ar"** line.
+
+To test your new spell checker, try typing a word in Arabic, and then deliberately misspelling it. You should see a zigzag line appear underneath to indicate that the word is misspelled. If so, you have successfully installed and enabled the spellchecker!
+
+## BONUS: Getting functions without downloading a package
+
+If you are having difficulty with installing packages in your environment, or if you would like to hard code functions into your script, you have a few options:
+
+1.  Search for the package on GitHub. Then go into the files, find the function that you are looking for, and copy and paste it into your code. (many GitHub repositories for R packages also have helpful Cheat Sheets and README files which can help you learn what they do. For example: https://github.com/tidyverse)
+
+2.  If a colleague has successfully installed the package on their machine, they can enter the name of the function into the console to get all or part of the code for it. This can also be used to search for the matching function in GitHub, or copied into your script. (to see what this might look like, try entering Reduce into the console and seeing what you get. This is a base R function.)
+
+3.  Be aware that some function names exist in more than one package. For example, filter() exists in both dplyr and base R (stats). When copying a function from a package, check whether the same name is already used elsewhere in your script. To be safe, you can always call functions explicitly using the :: syntax:
+
+    dplyr::filter() stats::filter()
+
+4.  Before copying a function into your script, check whether it calls other functions from the same package internally. If it does, you may need to copy those too, or the function will not run. You can spot these as function calls that don't look like base R — for example, calls to rlang:: or vctrs:: inside tidyverse functions. A function that only calls base R functions internally is the safest to copy.
+
+Note: copying individual functions works best for simple, self-contained functions. Complex functions from tidyverse packages often call other internal functions underneath, which means a full copy may require more than one function to work correctly.
