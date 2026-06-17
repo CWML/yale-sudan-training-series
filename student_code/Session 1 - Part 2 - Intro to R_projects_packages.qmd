@@ -160,6 +160,27 @@ You can copy and paste, or add the **"cSpell.language": "en,ar"** line.
 
 To test your new spell checker, try typing a word in Arabic, and then deliberately misspelling it. You should see a zigzag line appear underneath to indicate that the word is misspelled. If so, you have successfully installed and enabled the spellchecker!
 
+## EXERCISE 4
+
+Add Arabic to plots in R.
+(R's default graphics engine uses system fonts, and may not render Arabic correctly in plots. the showtext package fixes this if we add Arabic fonts)
+
+```{r}
+install.packages("showtext") 
+
+library(showtext)
+font_add_google("Tajawal", "tajawal")  # an Arabic Google Font
+showtext_auto()                         # tell R to use showtext for all plots
+
+ggplot(df, aes(x = المحافظة)) +
+  geom_bar() +
+  labs(title = "الحالات حسب المحافظة") +  # Arabic title
+  theme(text = element_text(family = "tajawal"))
+
+```
+
+You should see a plot in the lower right PLOTS window that now renders Arabic correctly!
+
 ## BONUS: Getting functions without downloading a package
 
 If you are having difficulty with installing packages in your environment, or if you would like to hard code functions into your script, you have a few options:
