@@ -1,0 +1,288 @@
+---
+title: "Session 3: Plots, Epi-Curves, and Maps "
+author: "Max Wegener"
+format: html
+editor: visual
+---
+
+# Load packages
+
+```{r}
+pacman::p_load(
+  here,
+  rio,
+  tidyverse,
+  janitor,
+  lubridate,
+  sf,
+  scales,
+  plotly,
+  slider,
+  RColorBrewer
+)
+```
+
+# Exercise
+
+**Use the code shown during the instruction for the cholera data as a guide. The coding pipeline and logic are identical—you just need to apply them to the Dengue dataset and shapefiles!**
+
+## Step 1: Load and Prepare the Cleaned Data
+
+Import the cleaned Dengue dataset you exported during Session 1 (dengue_linelist_clean.xlsx) from the processed_data folder. Call the object dengue_linelist. Ensure you explicitly verify or coerce the onset_date column to an R Date format, and ensure your geospatial coordinate columns are numeric types.
+
+```{r}
+# Import cleaned dengue line-list, verify dates, and check coordinates
+dengue_linelist <- rio::import(here("processed_data", "dengue_linelist_clean.xlsx")) %>%
+  mutate(
+    onset_date = as.Date(onset_date),
+    longitude  = as.numeric(longitude),
+    latitude   = as.numeric(latitude)
+  )
+```
+
+## Step 2: Constructing a Baseline Daily Epidemic Curve
+
+Using ggplot2 and geom_histogram(), construct a daily epidemic curve tracking the progression of this Dengue outbreak.
+
+- Set the bars to represent daily increments (binwidth = 1).
+
+- Use a clear, distinct border and fill color for the bars.
+
+```{r}
+# Generate the baseline daily epidemic curve
+# HINT: See Basic Epidemic Curve (Daily Intervals) on instructor file
+
+  ggplot(data = dengue_linelist, mapping = aes(x = age)) +
+  geom_histogram(binwidth = 5, fill = "grey50", color = "white") +
+  labs(title = "Exploratory Age Distribution Matrix", x = "Age (Years)", y = "Count") +
+  theme_minimal()
+```
+
+## Step 3: Stratified Weekly Facet Analysis
+
+Daily charts can sometimes mask wide-scale transmission velocities. Let's aggregate our temporal records into standard 7-day blocks and review regional patterns.
+
+- Set the histogram to pool data into weekly increments.
+
+- Map the Dengue virus serotype variable to the fill aesthetic.
+
+- Use facet_wrap() to generate separate timelines for each state_name.
+
+```{r}
+# Generate the facetted weekly epidemic curve stratified by Dengue serotype
+# HINT: See Facetted & Segmented Outbreak Overviews on instructor file
+
+ggplot(data = dengue_linelist, mapping = aes(x = onset_date, fill = serotype)) +
+  geom_histogram(binwidth = 7, position = "stack", color = "white", linewidth = 0.2) +
+  scale_fill_viridis_d(option = "plasma") +
+  scale_x_date(date_breaks = "7 days", labels = label_date_short()) +
+  labs(title = "Weekly Dengue Cases Stratified by Serotype", 
+       x = "Date of Symptom Onset (7-day Bins)", 
+       y = "Number of Cases", 
+       fill = "Serotype") +
+  theme_minimal() +
+facet_wrap(~ state_name, scales = "free_y")
+```
+
+## Step 4: Localized Deep Dive with a 7-Day Trailing Moving Average
+
+Identify the highest-burden state from your facetted plot. We will construct an advanced, publication-ready epidemic curve for that state to isolate operational transmission cycles from weekend reporting drops.
+
+**Hint: Find the placeholders (.A. and .B. and .C. and .D.) in the code chunk below and replace them with the appropriate items:**
+
+- .A. Dataframe name
+
+- .B. The specific high-burden state string value to filter by (e.g., "Red Sea")
+
+- .C. Date of symptom onset variable name
+
+- .D. Categorical variable name tracking clinical status (e.g., "outcome")
+
+```{r}
+# 1. Prepare data aggregated by epidemiological week for the selected state
+dengue_weekly_trends <- dengue_linelist %>%    #.A.
+  filter(state_name == "Khartoum" & !is.na(3)) %>%   #.B.
+  mutate(epi_week = floor_date(onset_date, unit = "week", week_start = 1)) %>%  #.C.
+  group_by(epi_week, outcome) %>%   #.D.
+  summarise(weekly_cases = n(), .groups = "drop") %>% 
+  
+  # Calculate total cases per week to feed the rolling average line
+  group_by(epi_week) %>% 
+  mutate(
+    total_weekly_cases = sum(weekly_cases),
+    avg_7day_rolling = slider::slide_index_dbl(
+      total_weekly_cases,
+      .i = epi_week,
+      .f = ~mean(.x, na.rm = TRUE),
+      .before = 2  # Current week plus 2 weeks prior
+    )
+  ) %>% 
+  ungroup()
+
+# 2. Plot the weekly epicurve with the rolling average trendline
+ggplot(data = dengue_weekly_trends) +
+  geom_bar(
+    mapping = aes(x = epi_week, y = weekly_cases, fill = outcome),
+    stat = "identity", position = "stack", color = "white", width = 6, alpha = 0.8
+  ) +
+  geom_line(
+    mapping = aes(x = epi_week, y = avg_7day_rolling, lty = "7-Week Rolling Trend"),
+    color = "black", linewidth = 1.2
+  ) +
+  scale_fill_brewer(palette = "Set1") +
+  scale_x_date(date_breaks = "2 weeks", labels = label_date_short(), expand = c(0.05, 0)) +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, NA)) +
+  labs(
+    title = "Weekly Dengue Outbreak Velocity & Trajectory Matrix",
+    x = "Epidemiological Week (Start Date)", y = "Cases per Week (n)",
+    fill = "Patient Outcome", lty = ""
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+## Step 5: Denominator-Standardized Mapping
+
+To target vector-control resources effectively, we must calculate population-adjusted incidence rates rather than mapping raw case counts (avoiding the "Choropleth Trap").
+
+- Load the provided sudan_adm1 spatial object.
+
+- Recode unmatched string characters (e.g., "Southern Darfur" to "South Darfur").
+
+- Join the 18-state population matrix to establish proper risk denominators.
+
+**Hint: Find the placeholders (.A. and .B. and .C.) in the code chunk below and replace them with the appropriate items:**
+
+- .A. The original shapefile object name containing administrative boundaries
+
+- .B. The population reference dataframe containing baseline denominators
+
+- .C. The specific mathematical variable calculation for population standardization
+
+```{r}
+# 1. Establish validated national population matrix for Sudan (All 18 States)
+state_pops <- tibble(
+  state_name = c(
+    "Khartoum", "South Darfur", "Gezira", "North Kordofan", 
+    "Kassala", "Central Darfur", "White Nile", "North Darfur", 
+    "Al Qadarif", "South Kordofan", "Sennar", "West Darfur", 
+    "River Nile", "Red Sea", "West Kordofan", "East Darfur", 
+    "Blue Nile", "Northern"
+  ),
+  population = c(
+    7993900, 5353025, 5096920, 3174029, 
+    2519071, 2499000, 2493880, 2304950, 
+    2208385, 2107623, 1918692, 1775945, 
+    1511442, 1482053, 1724897, 1587200, 
+    1108391,  936255
+  )
+)
+
+# 2. Harmonize Shapefile Strings on the fly
+sudan_adm1_clean <- sudan_adm1 %>%   #.A.
+  mutate(
+    state_name = case_when(
+      woe_name == "Southern Darfur" ~ "South Darfur",
+      woe_name == "North Kordufan"  ~ "North Kordofan",
+      woe_name == "Gedarif"         ~ "Al Qadarif",
+      woe_name == "Eastern Darfur"  ~ "East Darfur",
+      woe_name == "Western Darfur"  ~ "West Darfur",
+      TRUE                          ~ woe_name
+    )
+  ) %>%
+  group_by(state_name) %>%
+  summarise(geometry = st_union(geometry), .groups = "drop")
+
+# 3. Aggregate Dengue Line List Counts 
+dengue_counts <- dengue_linelist %>%
+  mutate(
+    state_name = if_else(state_name %in% state_pops$state_name, state_name, "Other/Unknown")
+  ) %>%
+  count(state_name, name = "n_cases")
+
+# 4. Execute Left-Join and compute population-standardized risk indices
+dengue_map_df <- sudan_adm1_clean %>%
+  left_join(dengue_counts, by = "state_name") %>%   
+  left_join(state_pops, by = "state_name") %>%   #.B.
+  mutate(
+    n_cases = replace_na(n_cases, 0),
+    # Calculate stable incidence rates per 100,000 residents
+    cases_per_100k = (n_cases / population)  #.C.
+  )
+
+# 5. Plot the final standardized risk map
+ggplot(dengue_map_df) +
+  geom_sf(aes(fill = cases_per_100k), colour = "grey40", linewidth = 0.3) +
+  scale_fill_viridis_c(option = "plasma", direction = -1, na.value = "grey70") +
+  labs(
+    title = "National Dengue Incidence Matrix, Sudan 2025",
+    subtitle = "Population-Standardized Attack Rates (Denominator Adjusted)",
+    fill  = "Cases per 100k"
+  ) +
+  theme_minimal()
+```
+
+## Step 6: Interactive Dashboard Point Map Component
+
+Bypass political boundaries by plotting precise coordinate intersections. Convert a static point distribution into a dynamic, hover-responsive map tracking local vector controls.
+
+**Hint: Find the placeholders (.A., .B., .C., .D., and .E.) in the code chunk below and replace them with the appropriate items:**
+
+- **.A.** Call the correct dataframe we have been working with in this exercise.
+
+- **.B.** Add the longitude variable name.
+
+- **.C.** Add the latitude variable name.
+
+- **.D.** Provide the name of the new spatial dataset (`sf` object) we created in part 1.
+
+- **.E.** Add the categorical variable name we want to color-code our points by (e.g., tracking patient status).
+
+```{r}
+library(ggplot2)
+library(plotly) 
+library(sf)
+
+# 1. Keep points as a completely flat dataframe (do NOT convert to st_as_sf)
+dengue_pts_df <- dengue_linelist %>%   #.A.
+  filter(!is.na(longitude) & !is.na(latitude)) #.B. and #.C.
+
+# 2. Transform AND cast the background boundaries to MULTIPOLYGON for plotly compatibility
+sudan_boundaries <- st_transform(sudan_adm1, 4326) %>% 
+  st_cast("MULTIPOLYGON") 
+
+# 3. Build the static ggplot with explicit x and y mapping
+dengue_point_map <- ggplot() +
+  # Background map layer (using the sanitized MULTIPOLYGON boundaries)
+  geom_sf(data = sudan_boundaries, fill = "grey95", colour = "grey85", linewidth = 0.2) +
+  
+  # Patient points layer via standard geom_point
+  geom_point(
+    data = dengue_pts_df,  #.D.
+    aes(
+      x = longitude,
+      y = latitude,
+      colour = outcome,  #.E.
+      # Custom hover text string intercepted by plotly
+      text = paste("Age:", age, "<br>Outcome:", outcome, "<br>Myalgia:", myalgia)
+    ),
+    alpha = 0.6, 
+    size = 1.5
+  ) +
+  
+  # Force matching coordinate system and bounding box zoom
+  coord_sf(xlim = c(21, 39), ylim = c(9, 22), crs = 4326) +
+  
+  scale_colour_brewer(palette = "Dark2") +
+  labs(
+    title = "Interactive Dengue Field Surveillance Points", 
+    x = "Longitude",
+    y = "Latitude",
+    colour = "Patient Outcome"
+  ) +
+  theme_minimal()
+
+# 4. Convert to an interactive plotly widget
+ggplotly(dengue_point_map, tooltip = "text")
+
+```

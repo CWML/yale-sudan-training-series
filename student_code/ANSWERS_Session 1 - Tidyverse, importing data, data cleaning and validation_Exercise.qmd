@@ -1,0 +1,166 @@
+---
+title: "Session 1: Tidyverse, importing data, data cleaning and validation_Exercise"
+author: "Max Wegener"
+format: html
+editor: visual
+---
+
+# Load packages
+
+```{r}
+pacman::p_load(
+  here,  
+  rio,         
+  tidyverse,
+  janitor,    
+  lubridate,    
+  matchmaker,   
+  epikit,    
+  skimr       
+)
+```
+
+# Exercise
+
+**Use the code shown during the instruction for eh cholera data as a guide, the coding and flow are pretty much identical**
+
+## Step 1: Importing Data
+
+Import *dengue_linelist_2025_sudan.xlsx* using the here() and rio() packages and call the object "dengue_linelist_raw"
+
+**Reminder!** we are importing from the *raw_data* folder
+
+```{r}
+# Finish writing the code to import the data here by repalcing each "..."
+dengue_linelist_raw <- import(here("raw_data", "dengue_linelist_2025_sudan.xlsx"))
+```
+
+## Step 2: Data Cleaning using the tidyverse
+
+Using the Tidyverse packages, we build one single cleaning pipeline using the pipe operator (`%>%`). Each pipe passes the result of one step to the next.
+
+**Hint: Find the following numbers in the code chunk and replace with the appropriate words. See instructor code.**
+
+Any number within quotations or asterisks (\*) the appropriate names/labels should be between them as well
+
+1.  New Dataframe name
+2.  Function name Variable name
+3.  New column name (see table below)
+4.  New column name (see table below)
+5.  New column name (see table below)
+6.  New column name (see table below)
+7.  New column name for state variable
+8.  current variable name for male and female values
+9.  New column name for age group variable
+10. New value to replace blanks and NAs in character columns
+
+- Start by updating the name of the DF to "dengue_linelist_clean*"*
+
+- Clean the column names
+
+- Convert date columns from POSIXct to an R Date
+
+- Rename columns to be more descriptive
+
+  | Old Name     | New Name        |
+  |--------------|-----------------|
+  | `date_onset` | `onset_date`    |
+  | `lat`        | `latitiude`     |
+  | `lon`        | `longitutde`    |
+  | `days_hosp`  | `hospital_days` |
+
+- Standardize messy state name values into clean, consistent categories
+
+- Change blanks or NA values to "unknown"
+
+- Select only the variables we need for analysis and arrange them
+
+```{r}
+#add cleaning code chunk here
+dengue_linelist_clean <- dengue_linelist_raw %>% 
+  # STEP 2a: Clean column names to be consistent and easier to work with           
+clean_names() %>%
+  # STEP 2b: Convert date columns from character strings to proper R Date objects
+  mutate(date_onset = as.Date(date_onset)) %>%
+  # STEP 2c: Rename columns to be more descriptive and consistent
+  rename(
+   onset_date   = date_onset,
+   latitude     = lat,
+   longitude   = lon,
+   hospital_days = days_hosp
+  ) %>%
+ mutate(
+    # ----- State -------------------------------------------------------
+      state_name = case_when(
+      str_detect(state, regex("blu|blue",  ignore_case = TRUE)) ~ "Blue Nile",
+      str_detect(state, regex("gez",       ignore_case = TRUE)) ~ "Gezira",
+      str_detect(state, regex("kass",      ignore_case = TRUE)) ~ "Kassala",
+      str_detect(state, regex("^khar",     ignore_case = TRUE)) ~ "Khartoum",
+      str_detect(state, regex("north",     ignore_case = TRUE)) ~ "North Darfur",
+      str_detect(state, regex("red",       ignore_case = TRUE)) ~ "Red Sea",
+      str_detect(state, regex("south",     ignore_case = TRUE)) ~ "South Darfur",
+      str_detect(state, regex("white",     ignore_case = TRUE)) ~ "White Nile",
+      is.na(state) | str_trim(state) == ""                       ~ "Other/Unknown",
+      TRUE                                                       ~ "Other/Unknown"
+    ),
+    
+    # ----- Sex ---------------------------------------------------------
+      sex = case_when(
+      str_detect(sex, regex("^m$",      ignore_case = TRUE)) ~ "male",
+      str_detect(sex, regex("^male$",   ignore_case = TRUE)) ~ "male",
+      str_detect(sex, regex("^f$",      ignore_case = TRUE)) ~ "female",
+      str_detect(sex, regex("^female$", ignore_case = TRUE)) ~ "female",
+      is.na(sex) | str_trim(sex) == ""                       ~ "unknown",
+      TRUE                                                   ~ "unknown"
+    )
+  ) %>% 
+  
+  # STEP 2e ── ordered age-group factor ---------------------------
+  mutate(
+   age_group = cut(
+      age,
+      breaks = c(0, 5, 15, 30, 45, 60, Inf),  
+      right   = FALSE,                         
+      include.lowest = TRUE,
+      labels = c("0–4", "5–14", "15–29",
+                 "30–44", "45–59", "60+")
+    )
+  ) %>%
+  # STEP 2f: Change blanks or NA values to "unknown" 
+  mutate(
+    across(
+      where(is.character),
+      ~ replace_na( na_if(trimws(.x), ""), "unkown" )
+    )
+  ) %>%
+  select(case_id, onset_date, state_name, age_group, everything(), -state)
+
+```
+
+## Step 3: Reinspect the cleaned dataframe
+
+Here is where you will count the new state_name variable to ensure you address all the spelling mistakes
+
+```{r}
+# Hint: DF_NAME %>% count(VARIABLE_NAME) to count the state_name variable
+# count state_name here
+
+dengue_linelist_clean %>% count(state_name)
+```
+
+Here, you will use skim() to make sure all the NAs and blanks are addressed
+
+```{r}
+# HINT: Use skim() to re-inspect the newly cleaned dengue dataframe
+skim(dengue_linelist_clean)
+```
+
+## Step 4: Exporting Cleaned Data
+
+Using here() and rio(), export the cleaned dataset to the "processed_data" folder and call the new file "dengue_linelist_clean.xlsx"
+
+```{r}
+# export the cleaned line-list to an Excel file in the "processed_data" folder
+
+rio::export(dengue_linelist_clean, here('processed_data', 'dengue_linelist_clean.xlsx'))
+```
