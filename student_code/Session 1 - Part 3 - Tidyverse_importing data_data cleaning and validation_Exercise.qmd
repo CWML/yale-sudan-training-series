@@ -8,9 +8,9 @@ editor: visual
 
 # Exercise
 
--   Select one computer to perform the exercise
+- Select one computer to perform the exercise
 
--   To show that you have completed the exercise, you group will share code in the file as well as the state_name counts output and the skim() output for the cleaned dataset.
+- To show that you have completed the exercise, you group will share code in the file as well as the state_name counts output and the skim() output for the cleaned dataset.
 
 **HINT: Use the code shown during the instruction for eh cholera data as a guide, the coding and flow are pretty much identical**
 
@@ -24,26 +24,26 @@ Import *dengue_linelist_2025_sudan.xlsx* using the here() and rio() packages and
 
 ## Step 2: Data Cleaning and Validation
 
--   Start by upodaitng the name of the DF to "dengue_linelist_clean*"*
+- Start by upodaitng the name of the DF to "dengue_linelist_clean*"*
 
--   Clean the column names
+- Clean the column names
 
--   Convert date columns from POSIXct to an R Date
+- Convert date columns from POSIXct to an R Date
 
--   Rename columns to be more descriptive
+- Rename columns to be more descriptive
 
-    | Old Name     | New Name      |
-    |--------------|---------------|
-    | `date_onset` | `onset_date`  |
-    | `lat`        | `latitiude`   |
-    | `lon`        | `longitutde`  |
-    | `days_hosp`  | hospital_days |
+  | Old Name     | New Name      |
+  |--------------|---------------|
+  | `date_onset` | `onset_date`  |
+  | `lat`        | `latitiude`   |
+  | `lon`        | `longitutde`  |
+  | `days_hosp`  | hospital_days |
 
--   Standardize messy state name values into clean, consistent categories
+- Standardize messy state name values into clean, consistent categories
 
--   Change blanks or NA values to "unknown"
+- Change blanks or NA values to "unknown"
 
--   Select only the variables we need for analysis and arrange them
+- Select only the variables we need for analysis and arrange them
 
 ```{r}
 #add cleaning code chunk here

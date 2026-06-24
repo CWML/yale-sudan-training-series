@@ -1,5 +1,5 @@
 ---
-title: "Session 3: Plots, Epi-Curves, and Maps "
+title: "Session 3: Epi-Curves and Maps "
 author: "Max Wegener"
 format: html
 editor: visual
@@ -40,6 +40,12 @@ dengue_linelist <- rio::import(here("processed_data", "dengue_linelist_clean.xls
   )
 ```
 
+Load the Sudan administrative boundary shapefile (level 1) for mapping.
+
+```{r}
+sudan_adm1 <- readRDS(here("data_spatial", "sudan_adm1.rds"))
+```
+
 ## Step 2: Constructing a Baseline Daily Epidemic Curve
 
 Using ggplot2 and geom_histogram(), construct a daily epidemic curve tracking the progression of this Dengue outbreak.
@@ -52,15 +58,17 @@ Using ggplot2 and geom_histogram(), construct a daily epidemic curve tracking th
 # Generate the baseline daily epidemic curve
 # HINT: See Basic Epidemic Curve (Daily Intervals) on instructor file
 
-  ggplot(data = dengue_linelist, mapping = aes(x = age)) +
+  ggplot(data = dengue_linelist, mapping = aes(x = onset_date)) +
   geom_histogram(binwidth = 5, fill = "grey50", color = "white") +
-  labs(title = "Exploratory Age Distribution Matrix", x = "Age (Years)", y = "Count") +
+  labs(title = "Daily Epidemic Curve of Dengue Outbreak", x = "Date of Symptom Onset", y = "Count") +
   theme_minimal()
 ```
 
 ## Step 3: Stratified Weekly Facet Analysis
 
-Daily charts can sometimes mask wide-scale transmission velocities. Let's aggregate our temporal records into standard 7-day blocks and review regional patterns.
+Daily charts can sometimes mask wide-scale transmission velocities.
+
+Let's aggregate our temporal records into standard 7-day blocks and review regional patterns.
 
 - Set the histogram to pool data into weekly increments.
 
@@ -92,7 +100,7 @@ Identify the highest-burden state from your facetted plot. We will construct an 
 
 - .A. Dataframe name
 
-- .B. The specific high-burden state string value to filter by (e.g., "Red Sea")
+- .B. The specific high-burden state string value to filter by (e.g., "Kartoum")
 
 - .C. Date of symptom onset variable name
 
@@ -125,10 +133,6 @@ ggplot(data = dengue_weekly_trends) +
     mapping = aes(x = epi_week, y = weekly_cases, fill = outcome),
     stat = "identity", position = "stack", color = "white", width = 6, alpha = 0.8
   ) +
-  geom_line(
-    mapping = aes(x = epi_week, y = avg_7day_rolling, lty = "7-Week Rolling Trend"),
-    color = "black", linewidth = 1.2
-  ) +
   scale_fill_brewer(palette = "Set1") +
   scale_x_date(date_breaks = "2 weeks", labels = label_date_short(), expand = c(0.05, 0)) +
   scale_y_continuous(expand = c(0, 0), limits = c(0, NA)) +
@@ -145,7 +149,7 @@ ggplot(data = dengue_weekly_trends) +
 
 To target vector-control resources effectively, we must calculate population-adjusted incidence rates rather than mapping raw case counts (avoiding the "Choropleth Trap").
 
-- Load the provided sudan_adm1 spatial object.
+**We already loaded the provided sudan_adm1 spatial object in the beginning of the exercise. Now we need to:**
 
 - Recode unmatched string characters (e.g., "Southern Darfur" to "South Darfur").
 
@@ -182,12 +186,12 @@ state_pops <- tibble(
 sudan_adm1_clean <- sudan_adm1 %>%   #.A.
   mutate(
     state_name = case_when(
-      woe_name == "Southern Darfur" ~ "South Darfur",
-      woe_name == "North Kordufan"  ~ "North Kordofan",
-      woe_name == "Gedarif"         ~ "Al Qadarif",
-      woe_name == "Eastern Darfur"  ~ "East Darfur",
-      woe_name == "Western Darfur"  ~ "West Darfur",
-      TRUE                          ~ woe_name
+      NAME_1 == "Southern Darfur" ~ "South Darfur",
+      NAME_1 == "North Kordufan"  ~ "North Kordofan",
+      NAME_1 == "Gedarif"         ~ "Al Qadarif",
+      NAME_1 == "Eastern Darfur"  ~ "East Darfur",
+      NAME_1 == "Western Darfur"  ~ "West Darfur",
+      TRUE                          ~ NAME_1
     )
   ) %>%
   group_by(state_name) %>%
@@ -224,7 +228,13 @@ ggplot(dengue_map_df) +
 
 ## Step 6: Interactive Dashboard Point Map Component
 
-Bypass political boundaries by plotting precise coordinate intersections. Convert a static point distribution into a dynamic, hover-responsive map tracking local vector controls.
+Instead of coloring whole states, we’ll plot **each case as an individual dot** using its GPS coordinates. Turning that static dot map into an interactive widget lets users:
+
+- zoom and pan to street level
+
+- hover to see patient details or control-measure status
+
+- filter or re-color points on the fly
 
 **Hint: Find the placeholders (.A., .B., .C., .D., and .E.) in the code chunk below and replace them with the appropriate items:**
 

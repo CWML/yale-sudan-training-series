@@ -7,15 +7,16 @@ editor: visual
 
 # Overview
 
-This session extends the data-cleaning skills from Session 1 into basic outbreak epidemiology and spatial visualisation.\
-Skills you will practice:
+Building on the data-cleaning techniques from Session 1, this session moves into basic descriptive epidemiology: frequency tables, summary measures, and introductory statistical tests. Every code chunk is annotated with inline comments (lines beginning with `#`) that briefly explain what each command does, letting you follow the workflow step by step.
 
-| Aim | Tool / function |
-|--------------------------|----------------------------------------------|
-| 1\. Produce clean descriptive tables | **janitor::tabyl()**, **gtsummary**, **dplyr::count()** |
-| 2\. Compute measures of association | 2×2 tables ➜ **epitools::oddsratio()** & **epiR::epi.2by2()** |
-| 3\. Calculate attack rates | **dplyr** pipelines |
-| 4\. Draw an epidemic curve | **ggplot2** |
+## Exercises
+
+Hands-on practice breaks are built into the lesson. The exercise file for this session is located in `student_code/` and is named:\
+“Session 2 - Summaries and Measures_Exercise.qmd”
+
+## Answer Key
+
+Solutions are in the same folder. The answer sheet for this session is: “ANSWERS_Session 2 - Summaries and Measures_Exercise.qmd”
 
 # Packages used for this session
 
@@ -44,31 +45,60 @@ pacman::p_load(
 
 # Load exercise data
 
-We will load the cleaned cholera line-list that we created in Session 1, as well as a dataset of controls that we will use for calculating attack rates and measures of association. We will then combine the cases and controls into a single dataset for analysis.
+We will load the cleaned cholera line-list that we created in Session 1.
 
-Purpose: import cleaned cholera line-list & coerce onset_date to Date When importing spreadsheets from Excel via rio::import(), date columns can occasionally revert to raw character strings or numeric Excel serial timestamps. We explicitly wrap as.Date() inside a mutate() statement to protect downstream time-series operations like epi-curves.
+**Quick Note:**
 
-**Purpose: import cleaned cholera line-list & coerce onset_date to Date**
+After re-importing the cleaned cholera line-list for Session 2, force `onset_date` back to class `Date`:
 
 ```{r}
 # Packages: rio::import(), dplyr::mutate()
+
 cholera_linelist <- import(here("processed_data", "cholera_linelist_clean.xlsx")) %>%
-  mutate(onset_date = as.Date(onset_date))
+  mutate(onset_date = as.Date(onset_date)) # convert the onset_date column from character/factor to Date class
 ```
+
+**Why?**\
+• `rio::import()` can read Excel dates as character strings or Excel serial numbers.\
+• Many time-series tasks—sorting chronologically, calculating intervals, grouping by week, plotting with `ggplot2` date scales—require the `Date` class.\
+• Converting immediately with `as.Date()` prevents subtle errors later in epi-curve construction and other temporal analyses.
 
 # Descriptive tables for categorical variables using the tbyl within the janitor package
 
-Descriptive tables are the absolute baseline of field epidemiology. Before jumping to advanced models, you must understand the distribution of counts, missing values, and percentages across demographic parameters like sex, state, and outcome. While standard base::table() works, the {janitor} package provides tabyl(), which outputs clean, tidy dataframes that can accept custom formatting modifiers.
+Descriptive tables are the natural starting point for exploring a new dataset. Before moving on to complex models, it’s helpful to review simple counts, percentages, and missing-value patterns for key variables such as sex, region, and outcome.
+
+In this session we’ll use two helpful tools:
+
+- `tabyl()` from the `janitor` package – quickly produces tidy, easy-to-read frequency tables.
+
+- `get_summary_stats()` from the `rstatix` package - returns common summary statistics (n, mean, SD, median, IQR, etc.) for numeric variables and groups you specify.
+
+Together these functions let you see the shape of your data at a glance and spot any issues that need attention before deeper analysis.
+
+Additionally, the `janitor` package comes with several adorn functions that specifically work with `tabyl()` that enhance tables with additional formatting and information. The different adorn functions include:
+
+1.  adorn_totals() - MUST come first (after tbyl()\] since it needs raw numbers
+
+2.  adorn_percentages() - converts to proportions
+
+3.  adorn_rounding() - if needed, to round proportions
+
+4.  adorn_pct_formatting() - converts to percents and formats
+
+5.  adorn_ns() - adds the raw counts
+
+6.  adorn_title() - adds titles last -\> row_names=" "; col_name=" "; placement="combined"; placement="top"
 
 ## Simple frequency table
 
-A simple single-variable frequency sweep allows us to identify case distributions by geographical area and flag structural formatting errors or empty levels.
+A simple single-variable frequency table allows us to identify case distributions by geographical area and flag structural formatting errors or empty levels.
 
 ```{r}
-# Packages: janitor::tabyl(), janitor::adorn_pct_formatting()
-cholera_linelist %>% 
-  tabyl(state_name, show_missing_levels = TRUE) %>% 
-  adorn_pct_formatting()
+# Packages: janitor
+
+cholera_linelist %>%          # start with the cleaned line-list data frame
+  tabyl(state_name) %>%        # make a frequency table of the `state_name` column
+  adorn_pct_formatting()       # add and format percentage columns for readability
 ```
 
 ## Two-way cross-tabulation
@@ -76,8 +106,10 @@ cholera_linelist %>%
 Cross-tabulations evaluate the raw intersections of two categorical parameters (e.g., checking outcomes stratified by sex).
 
 ```{r}
+# Packages: janitor
+
 cholera_linelist %>% 
-  tabyl(sex, outcome)
+  tabyl(sex, outcome) # two arguments separated by a comma is used to build a 2-way table
 ```
 
 ## Advanced multi-adorned table
@@ -85,43 +117,77 @@ cholera_linelist %>%
 By chaining adorn\_ functions, we can format a raw table into a highly legible, professional descriptive summary featuring nested row percentages alongside raw frequencies.
 
 ```{r}
+# Packages: janitor
+
 cholera_linelist %>% 
-  tabyl(sex, outcome) %>% 
-        adorn_totals("row") %>%        # optional Total row
-        adorn_percentages("row") %>% 
-        adorn_pct_formatting(digits = 1) %>% 
-        adorn_ns(position = "front")
+tabyl(sex, outcome) %>%                 # 1) build a two-way table: rows = sex, columns = outcome
+  adorn_totals("row") %>%               # 2) add a “Total” row summing across outcomes
+  adorn_percentages("row") %>%          # 3) turn counts into row-wise percentages
+  adorn_pct_formatting(digits = 1) %>%  # 4) format percentages with one decimal & a “%” sign
+  adorn_ns(position = "front")          # 5) show the raw counts (n) before each percentage
 ```
 
-# Summary statistics for numeric variables using get_summary_stats within the statix package
++------------------------------------------------------------------------------------------------------------------------------------------------+
+| Exercise Breakout                                                                                                                              |
++================================================================================================================================================+
+| We’ll pause for a short breakout exercise. You’ll be placed into breakout rooms now.                                                           |
+|                                                                                                                                                |
+| Please open **“Session 2: Summaries, Measures, Tables, & Epi-curves_Exercise”**. Once it opens:                                                |
+|                                                                                                                                                |
+| 1.  Load the packages listed at the top of the file.                                                                                           |
+|                                                                                                                                                |
+| 2.  Complete **Step 1: Load the Cleaned Data** and **Step 2: Descriptive Frequency Tables**                                                    |
+|                                                                                                                                                |
+| You can work on this together in your breakout room—talk through the steps and problem-solve as a group. You’ll have **10 minutes** to finish. |
++------------------------------------------------------------------------------------------------------------------------------------------------+
 
-Continuous variables (like age) cannot be neatly described using simple frequency tabulations. Instead, we use central tendency metrics (means, medians) and parameters of dispersion (standard deviations, Interquartile Ranges \[IQR\]) to identify demographic shifting. We use rstatix::get_summary_stats() because it integrates beautifully with piped data workflows.
+# Summary statistics for numeric variables using the `get_summary_stats()` function from the `rstatix` package
+
+Unlike categorical variables, truly continuous variables (e.g., age) are better summarized by measures of central tendency (mean, median) and dispersion (standard deviation, interquartile range). The `get_summary_stats()` function returns these metrics and fits naturally into a dplyr pipe `(%>%)`, making it easy to integrate with the rest of the workflow.
 
 ## Overall summary statistics for age
 
 ```{r}
+# Packages: rstatix
+
 cholera_linelist %>%
-  get_summary_stats(age, type = "common")
+get_summary_stats(age, type = "common")  # compute the standard “common” set of descriptive stats (n, mean, SD, median, IQR, min, max) for the age variable
 ```
 
-## Summary statistics using one grouping variable
+## Summary statistics using a single grouping variable
 
-In an active epidemic, evaluating whether severe clinical outcomes skew towards specific age thresholds is vital. Here, we group by case outcome to check if older populations face distinct risk profiles.
+Sometimes we want to see whether a numeric variable (*age*) differs across categories (*outcome*). By grouping the data by *outcome* and then calling the `get_summary_stats()` function from the `rstatix` package, we obtain counts, means, medians, and other descriptive measures for each outcome level (recovered, hospitalized, or death), making it easy to compare age distributions across the groups.
 
 ```{r}
+# Packages: rstatix
+
 cholera_linelist %>% 
-  group_by(outcome) %>% 
-  get_summary_stats(age, type = "common")# Measures of association 
+  group_by(outcome) %>% # split the data into separate groups by patient outcome
+  get_summary_stats(age, type = "common")# and compute the standard “common” set of descriptive stats for each outcome group
 ```
 
-## Summary statistics using more than one grouping variable
+## Summary statistics using multiple grouping variable
 
 By adding nested grouping fields, you can review finer strata within the data—such as monitoring whether age trends vary when interacting with both biological sex and clinical outcome.
 
+When a single grouping factor isn’t enough, you can group by two (or more) categorical variables to look at more granular patterns.
+
+In this example we ask whether age differs across sex and clinical outcome. Chaining `group_by(sex, outcome)` with `get_summary_stats()` returns n, mean, median, SD, IQR, min, and max for each sex & outcome stratum:
+
+- Female – Recovered
+
+- Female – Hospitalized
+
+- Male – Recovered
+
+and so on—making it easy to spot age differences that might otherwise be hidden.
+
 ```{r}
+# Packages: rstatix
+
 cholera_linelist %>% 
-  group_by(sex, outcome) %>% 
-  get_summary_stats(age, type = "common")# Measures of association 
+  group_by(sex, outcome) %>%  # split data by every Sex × Outcome combination
+  get_summary_stats(age, type = "common")# and compute the standard “common” set of descriptive stats for each outcome group
 ```
 
 # Simple statistical tests
@@ -130,42 +196,72 @@ To determine if variations between patient groups represent random noise or stat
 
 ## Parametric Comparisons:
 
+In statistics, a parametric method assumes that your data follow a known, mathematical distribution. Most commonly a normal (bell-shaped) distribution, summarized by its mean and standard deviation.
+
+When these assumptions are (at least approximately) true, parametric tests squeeze more information out of the data and are usually more powerful than their non-parametric counterparts.
+
+Here are a few ways you can check to see if your data are suitable for parametric tests:
+
+1.  Look at a histogram or density plot
+    - Does it roughly resemble a bell curve?
+    - Mild skewness is fine, but pronounced skew or heavy tails signal trouble.
+2.  Check summary statistics
+    - Mean ≈ median and skewness near zero usually indicate symmetry. Large gaps hint at skew.
+    - Very small sample sizes (n \< 30 per group) magnify the impact of non-normality.
+3.  Calucalte Kurtosis
+    - \|excess kurtosis\| \< 1 → close enough to normal for most purposes.
+    - 1 – 2 → worth a closer look (check plots, maybe transform).
+    - \> 2 or \< –2 → heavy-tailed or very flat; parametric tests may be unreliable unless sample sizes are large.
+4.  Run a quick normality test
+    - Shapiro–Wilk test
+5.  Draw a Q–Q (quantile–quantile) plot
+    - If the points lie close to the diagonal line, the data fit a normal distribution reasonably well.
+    - Systematic curves away from the line suggest non-normality.
+
 ### Student's t-test
 
-A t-test compares the means of a continuous variable between exactly two independent groups. This test assumes that the underlying continuous metric follows a roughly normal distribution. Here, we evaluate whether the mean age differs significantly between male and female cholera cases.
+A t-test compares the means of a continuous variable between exactly two independent groups. This test assumes that the underlying continuous metric follows a roughly normal distribution.
+
+Here, we evaluate whether the mean *age* differs significantly between the two independent groups within *sex*: male and female.
 
 ```{r}
+# No packages used, just bse R 
+
 t.test(age ~ sex, data = cholera_linelist)
 ```
 
-**Formatted reporting table using {gtsummary}**
+**Formatted reporting table using the `gtsummary` package**
 
-Rather than copy-pasting raw text outputs from the console, {gtsummary} automatically extracts the underlying statistical arrays and builds an elegant summary table including the calculated p-value.
+Instead of copy-pasting console output, the `tbl_summary()` function within the `gtsummary` package converts your data frame directly into a publication-ready table. When you chain `add_p()`, the function runs the appropriate statistical test and inserts the corresponding p-value, giving you a complete, polished summary in one pipeline.
 
 ```{r}
+# Packages: gtsummary, tidyverse
+
 cholera_linelist %>% 
-  select(age, sex) %>%             # keep variables of interest
-  tbl_summary(                               # produce summary table
-    statistic = age ~ "{mean} ({sd})", # specify what statistics to show
-    by = sex) %>%                        # specify the grouping variable
-  add_p(age ~ "t.test") 
+  select(age, sex) %>%                 # keep only the variables needed for the summary
+  tbl_summary(                         # create a {gtsummary} table
+    statistic = age ~ "{mean} ({sd})", # show mean and SD for age in each group
+    by = sex                           # split the summary by sex (Female vs. Male)
+  ) %>% 
+  add_p(age ~ "t.test")                # append a p-value from a two-sample t-test comparing ages between the two sex groups
 ```
 
 ### Analysis of Variance (ANOVA)
 
-An ANOVA test expands on the t-test by comparing the means of a continuous variable across three or more independent groups (e.g., comparing mean age profiles across Recovered vs. Died vs. Hospitalised cohorts).
+A one-way ANOVA generalizes the independent-samples t-test by testing whether the mean of a continuous variable differs across two or more independent groups—for example, comparing mean *age* among patient *outcome*: who recovered, were hospitalized, or died.
 
 ```{r}
-library(rstatix)
+# Packages: rstatix, tidyverse
 
 cholera_linelist %>% anova_test(age ~ outcome)
 ```
 
-**Formatted ANOVA summary table via {gtsummary}**
+**Formatted ANOVA summary table via the gtsummary package**
+
+Instead of copy-pasting console output, the `tbl_summary()` function within the `gtsummary` package converts your data frame directly into a publication-ready table. When you chain `add_p()`, the function runs the appropriate statistical test and inserts the corresponding p-value, giving you a complete, polished summary in one pipeline.
 
 ```{r}
-library(gtsummary)
-library(dplyr) # Explicitly using dplyr for data manipulation
+# Packages: gtsummary, tidyverse
 
 cholera_linelist %>%
   select(age, outcome) %>%
@@ -176,7 +272,7 @@ cholera_linelist %>%
   add_p(test = all_continuous() ~ "oneway.test") # Uses base R's robust one-way ANOVA
 ```
 
-## Non-Parametric Comparisons
+## Non-Parametric Comparisons:
 
 ### Chi-squared test
 
@@ -190,22 +286,29 @@ When a continuous variable is highly skewed, highly irregular, or contains extre
 
 The Wilcoxon rank-sum test assesses whether the distributions of a continuous variable differ significantly between two categorical groups without assuming a bell-curve distribution.
 
+Here we will calculate a wilcoxon rank sum test for age and sex
+
 ```{r}
-# calcaulte a wilcoxon rank sum test for age and sex
+# no packages used, just base R
+
 wilcox.test(age ~ sex, data = cholera_linelist)
 ```
 
-**Formatted Wilcoxon summary table via {gtsummary}**
+**Formatted Wilcoxon summary table using the `gtsummary` package**
 
-Notice that for non-parametric data, we alter our reporting metrics from mean (sd) to median (IQR) to accurately represent the data's central tendency.
+Instead of copy-pasting console output, the `tbl_summary()` function within the `gtsummary` package converts your data frame directly into a publication-ready table. When you chain `add_p()`, the function runs the appropriate statistical test and inserts the corresponding p-value, giving you a complete, polished summary in one pipeline.
+
+Notice that for non-parametric data, we alter our reporting metrics **from** mean (sd) **to** median (IQR) to accurately represent the data's central tendency.
 
 ```{r}
+# Packages: gtsummary, tidyverse
+
 cholera_linelist %>% 
-  select(age, sex) %>%                       # keep variables of interest
-  tbl_summary(                                         # produce summary table
-    statistic = age ~ "{median} ({p25}, {p75})", # specify what statistic to show (this is default so could remove)
-    by = sex) %>%                                  # specify the grouping variable
-  add_p(age ~ "wilcox.test")  
+  select(age, sex) %>%                          # keep variables of interest
+  tbl_summary(                                  # gtsummary: build a summary table
+    statistic = age ~ "{median} ({p25}, {p75})",# specify what statistic to show (this is default so could remove)
+    by = sex) %>%                               # specify the grouping variable
+  add_p(age ~ "wilcox.test")                    # gtsummary: add a column of p-values using a Wilcoxon rank-sum (Mann–Whitney) test
 ```
 
 ### **Multi-Group Non-Parametric Comparison: Kruskal-Wallis Test**
@@ -215,47 +318,73 @@ The Kruskal-Wallis test is a non-parametric test used to compare the distributio
 In this case, we will compare the age distribution of cholera cases between different outcomes (e.g., recovered, died, hospitalised).
 
 ```{r}
+# no packages used, just base R
+
 kruskal.test(age ~ outcome, data = cholera_linelist)
 ```
 
-**Formatted Kruskal-Wallis summary table via {gtsummary}**
+**Formatted Kruskal-Wallis summary table using the `gtsummary` package**
+
+Instead of copy-pasting console output, the `tbl_summary()` function within the `gtsummary` package converts your data frame directly into a publication-ready table. When you chain `add_p()`, the function runs the appropriate statistical test and inserts the corresponding p-value, giving you a complete, polished summary in one pipeline.
+
+Notice that for non-parametric data, we alter our reporting metrics **from** mean (sd) **to** median (IQR) to accurately represent the data's central tendency.
 
 ```{r}
+# Packages: gtsummary, tidyverse
+
 cholera_linelist %>% 
   select(age, outcome) %>%                       # keep variables of interest
-  tbl_summary(                                         # produce summary table
+  tbl_summary(                                   # gtsummary: build a summary table
     statistic = age ~ "{median} ({p25}, {p75})", # specify what statistic to show (this is default so could remove)
-    by = outcome) %>%                                  # specify the grouping variable
-  add_p(age ~ "kruskal.test")    # ≥2-group non-parametric test
+    by = outcome) %>%                            # specify the grouping variable
+  add_p(age ~ "kruskal.test")      # gtsummary: add a column of p-values using a Kruskal-Wallis (for ≥2-group) non-parametric test
 ```
 
 ### **Categorical Association: Pearson χ² Test of Independence**
 
-The Pearson χ² test evaluates whether the distribution of one categorical variable differs across the levels of another categorical variable.
+The Pearson χ² test checks whether two categorical variables are independent—that is, whether the distribution of one variable changes across the categories of the other.
 
-Here we test whether patient sex is independent of clinical outcome (three levels: recovered, death, hospitalised).
+In our case, we use it to determine whether the proportion of males and females differs across the three outcome groups (recovered, hospitalised, died).
 
 ```{r}
+# no packages used, just base R
+
 chisq.test(
   x = cholera_linelist$sex,
   y = cholera_linelist$outcome
 )
 ```
 
-**Formatted χ² summary table via {gtsummary}**
+**Formatted χ² summary table using the `gtsummary` package**
+
+Instead of copy-pasting console output, the `tbl_summary()` function within the `gtsummary` package converts your data frame directly into a publication-ready table. When you chain `add_p()`, the function runs the appropriate statistical test and inserts the corresponding p-value, giving you a complete, polished summary in one pipeline.
+
+Notice that for non-parametric data, we alter our reporting metrics **from** mean (sd) **to** median (IQR) to accurately represent the data's central tendency.
 
 ```{r}
-# Packages: gtsummary::tbl_cross(), gtsummary::add_p()
+# Packages: gtsummary, tidyverse
 
-cholera_linelist %>% 
-  tbl_cross(
-    row = sex,
-    col = outcome,
-    percent = "row"          # show row-wise %
+cholera_linelist %>%                
+  tbl_cross(                         # gtsummary: create a two-way table
+    row   = sex,                     # rows = sex (e.g., Female, Male)
+    col   = outcome,                 # columns = clinical outcome (Recovered, Hospitalised, Died)
+    percent = "row"                  # display row-wise percentages (sums to 100% within each sex)
   ) %>% 
-  add_p(test = "chisq.test") %>% 
-  bold_labels()
+  add_p(test = "chisq.test") %>%     # attach a Pearson χ² p-value for the sex × outcome association wiht calcualted p-value
+  bold_labels()                      # gtsummary: bold the row/column headers for readability
 ```
+
++------------------------------------------------------------------------------------------------------------------------------------------------+
+| Exercise Breakout                                                                                                                              |
++================================================================================================================================================+
+| We’ll pause for a short breakout exercise. You’ll be placed into breakout rooms now.                                                           |
+|                                                                                                                                                |
+| Please open **“Session 2: Summaries, Measures, Tables, & Epi-curves_Exercise”**. Once it opens:                                                |
+|                                                                                                                                                |
+| - Complete **Step 3: Summary Statistics & Simple Hypothesis Testing**                                                                          |
+|                                                                                                                                                |
+| You can work on this together in your breakout room—talk through the steps and problem-solve as a group. You’ll have **10 minutes** to finish. |
++------------------------------------------------------------------------------------------------------------------------------------------------+
 
 ## Table 1: Comprehensive Baseline Characteristics Table
 
@@ -268,62 +397,76 @@ The code block below automatically detects variable formats, assigns appropriate
 # dplyr, gtsummary, gt          
 # gt comes with {gtsummary} for pretty output
 
-# ── designate variable types ─────────────────────────────
-# Define input vectors based on measurement scale
-cont_vars <- c("age")
-
-cat_vars  <- c(
-  "age_group", "state_name", "sex", "dehydration", "treatment", "water_source",
-  "watery_diarrhea", "vomiting", "leg_cramps",
-  "dehydration_signs", "fever"
-)
-
 # ── build Table 1: stratify by outcome (recovered vs death) ─────────────
 tbl1 <- cholera_linelist %>% 
-  select(outcome, all_of(cont_vars), all_of(cat_vars)) %>% 
-  mutate(
-    across(all_of(cat_vars), as.factor),     # be sure categoricals are factors
-    outcome = factor(outcome,
-                     levels = c("recovered", "death", "hospitalised"))   # set column order
+  # 1. Select the outcome and all your variables
+  select(
+    outcome, age, age_group, state_name, sex, dehydration, treatment, 
+    water_source, watery_diarrhea, vomiting, leg_cramps, dehydration_signs, fever
   ) %>% 
+  # 2. Convert the categorical variables to factors explicitly
+  mutate(
+    across(
+      c(age_group, state_name, sex, dehydration, treatment, water_source, 
+        watery_diarrhea, vomiting, leg_cramps, dehydration_signs, fever), 
+      as.factor
+    ),     
+    outcome = factor(outcome, levels = c("recovered", "death", "hospitalised"))   
+  ) %>% 
+  # 3. Create the summary table (gtsummary will auto-detect 'age' as continuous)
   tbl_summary(
     by        = outcome,
-    type      = list(all_of(cont_vars) ~ "continuous"),
     statistic = list(
-                 all_continuous()  ~ "{mean} ± {sd}",     # change to median/IQR if desired
+                 all_continuous()  ~ "{mean} ± {sd}",     
                  all_categorical() ~ "{n} ({p}%)"
                ),
-    missing   = "no"                                     # omit explicit missing rows
+    missing   = "no"                                     
   ) %>% 
-  add_n()                             %>%  # overall N per column
-add_p(
-  test = list(
-    all_categorical() ~ "chisq.test.no.correct",
-    all_continuous()  ~ "aov"
-  )
-)%>% 
-  bold_labels()                      %>%  # bold variable names
+  add_n() %>%  
+  add_p(
+    test = list(
+      all_categorical() ~ "chisq.test.no.correct",
+      all_continuous()  ~ "aov"
+    )
+  ) %>% 
+  bold_labels() %>%  
   modify_spanning_header(all_stat_cols() ~ "**Outcome**") %>%
-  modify_header(label = "**Variable**")   %>%
-  modify_footnote(
-    p = "Categorical: χ² test; Continuous: two-sample t-test."
-  )
+  modify_header(label = "**Variable**")
 
 # ── display in notebook / Jupyter / Quarto ───────────────
 tbl1
 ```
 
++------------------------------------------------------------------------------------------------------------------------------------------------+
+| Exercise Breakout                                                                                                                              |
++================================================================================================================================================+
+| We’ll pause for a short breakout exercise. You’ll be placed into breakout rooms now.                                                           |
+|                                                                                                                                                |
+| Please open **“Session 2: Summaries, Measures, Tables, & Epi-curves_Exercise”**. Once it opens:                                                |
+|                                                                                                                                                |
+| - Complete **Step 4: Constructing a Publication-Ready "Table 1"**                                                                              |
+|                                                                                                                                                |
+| You can work on this together in your breakout room—talk through the steps and problem-solve as a group. You’ll have **15 minutes** to finish. |
++------------------------------------------------------------------------------------------------------------------------------------------------+
+
 # Common epidemiological measures used for case-only data
 
 ## Case Fatality Risk / Ratio (CFR)
 
-**The Concept** CFR is the ultimate measure of clinical severity and surveillance sensitivity in a public health ministry. It tracks the proportion of cases that result in death. Formula:
+The case-fatality ratio (or risk) is the proportion of identified cases of a disease that result in death—a straightforward gauge of how severe the illness is and how well case management and surveillance are working.
 
-CFR=(Total Cases / Deaths)×100
+**Formula**\
+CFR (%) = (Deaths ÷ Total cases) × 100
 
-**When to Use It:** Constantly. For diseases like cholera, the international WHO benchmark is \<1%. If the ministry's CFR climbs to 3% or 4%, it flags an immediate breakdown in the system (e.g., fluid distribution failures, or patients arriving too dehydrated to save).
+**Interpretation & Use**
+
+- Monitor it continuously during outbreaks to detect changes in disease severity or gaps in care.
+
+- For example, cholera, WHO recommends a CFR below 1 %. Values rising to 3 – 4 % signal serious problems—such as delayed care-seeking, inadequate rehydration supplies, or other failures in the health-care system—that demand immediate action.
 
 ```{r}
+# Packages: tidyverse, dplyr
+
 cholera_linelist %>%
   summarise(
     total_cases = n(),
@@ -334,40 +477,33 @@ cholera_linelist %>%
 
 ## Proportional Morbidity (Exposure Proportions)
 
-**The Concept** Since ministry workers cannot calculate the risk of getting sick from an exposure, they must calculate the distribution of exposures among those who are already sick. Formula: Proportion=(Total Cases / Cases with Exposure X)×100
+**Definition**\
+When the size of the population at risk is unknown, epidemiologists often describe the distribution of specific exposures among the people who have already become ill. The proportion of cases reporting a given exposure indicates how common that exposure is within the case group.
 
-**When to Use It:** To track the moving targets of an outbreak. If 80% of cases in Week 1 report using piped water, but by Week 3, 75% of new cases report using a specific market's food stall, the ministry knows the vehicle of transmission has shifted.
+**Formula**\
+Proportion of cases with exposure X (%) = (Cases with exposure X ÷ Total cases) × 100
+
+**Purpose**\
+Tracking these proportions over time helps identify shifts in likely sources of infection. For example, if 80 % of cases in week 1 report drinking piped water but, by week 3, 75 % report eating at a particular market stall, investigators can focus control measures on the emerging exposure.
 
 ```{r}
-library(janitor)
-
+# Packages: janitor, tidyverse
 # Tracks the changing proportion of water sources among cases over time
+
 cholera_linelist %>%
-  #filter( !is.na(onset_date) & onset_date >= as.Date("2025-01-01") & onset_date <= as.Date("2025-01-31")) %>%
-  tabyl(water_source) %>%
-  adorn_pct_formatting()
+  #filter( !is.na(onset_date) & onset_date >= as.Date("2025-01-01") & onset_date <= as.Date("2025-01-31")) %>% #can resitrct time
+  tabyl(water_source) %>%              # count cases by reported water source
+  adorn_pct_formatting()               # add a column showing counts as %
 ```
 
-# Group Exercise
-
-Time allowed: 45 minutes
-
-Working in your assigned groups of 4 or 5, you will apply the analytical principles practiced above to a different epidemiological dataset: dengue_linelist_2025_sudan.xlsx.
-
-Your Objectives:
-
--   **Data Import & Prep:** Open your group workspace folder, locate the spreadsheet inside processed_data, and verify that the symptom onset date variable is explicitly parsed as a Date object.
-
--   **Descriptive Tables:** Generate a frequency table of dengue cases by state. Create a 2-way table looking at patient sex against clinical outcomes.
-
--   **Statistical Testing:** Investigate whether there is a significant difference in age between dengue cases who recovered versus those who were hospitalised or died. Pick the correct parametric or non-parametric test based on the age distribution.
-
--   **Table 1 Production:** Use {gtsummary} to assemble a formatted baseline characteristics table stratified by patient state.
-
--   **Case-Only Surveillance Metrics:**
-
-    -   Calculate the global Case Fatality Risk (CFR) for this dengue outbreak. Then, calculate and compare the CFR across different states to see where clinical outcomes are most severe.
-
-    -   Calcualte the Proportional Morbidity and use date-filtering to calculate the proportion of cases reporting a specific exposure (e.g., presence of open water storage containers) during the first week of the outbreak versus the final week of data. Did the primary exposure profile shift?
-
-Navigate to your group's folder, open student_code / Session 2: Summaries, Measures, Tables, & Epi-curves.qmd, and complete the exercises. Be ready to share your code and data visualizations with the class during the wrap-up discussion!
++------------------------------------------------------------------------------------------------------------------------------------------------+
+| Exercise Breakout                                                                                                                              |
++================================================================================================================================================+
+| We’ll pause for a short breakout exercise. You’ll be placed into breakout rooms now.                                                           |
+|                                                                                                                                                |
+| Please open **“Session 2: Summaries, Measures, Tables, & Epi-curves_Exercise”**. Once it opens:                                                |
+|                                                                                                                                                |
+| - Complete **Step 5: Case Fatality Risk / Ratio (CFR)** and **Step 6: Proportional Morbidity (Exposure Proportions)**                          |
+|                                                                                                                                                |
+| You can work on this together in your breakout room—talk through the steps and problem-solve as a group. You’ll have **10 minutes** to finish. |
++------------------------------------------------------------------------------------------------------------------------------------------------+

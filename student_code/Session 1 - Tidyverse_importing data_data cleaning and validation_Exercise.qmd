@@ -22,7 +22,7 @@ pacman::p_load(
 
 # Exercise
 
-**Use the code shown during the instruction for eh cholera data as a guide, the coding and flow are pretty much identical**
+**Use the code shown during the instruction for the cholera data as a guide. The coding pipeline and logic are identical—you just need to apply them to the Dengue dataset!**
 
 ## Step 1: Importing Data
 
@@ -39,7 +39,7 @@ dengue_linelist_raw <- improt(here("...", "..."))
 
 Using the Tidyverse packages, we build one single cleaning pipeline using the pipe operator (`%>%`). Each pipe passes the result of one step to the next.
 
-**Hint: Find the following numbers in the code chunk and replace with the appropriate words. See instructor code.**
+**Hint: Find the following numbers in the code chunk and replace with the appropriate words. See instructor code for additional help.**
 
 Any number within quotations or asterisks (\*) the appropriate names/labels should be between them as well
 
@@ -50,30 +50,30 @@ Any number within quotations or asterisks (\*) the appropriate names/labels shou
 5.  New column name (see table below)
 6.  New column name (see table below)
 7.  New column name for state variable
-8.  current varaible name for male and female values
+8.  current variable name for male and female values
 9.  New column name for age group variable
 10. New value to replace blanks and NAs in character columns
 
--   Start by updating the name of the DF to "dengue_linelist_clean*"*
+- Start by updating the name of the DF to "dengue_linelist_clean*"*
 
--   Clean the column names
+- Clean the column names
 
--   Convert date columns from POSIXct to an R Date
+- Convert date columns from POSIXct to an R Date
 
--   Rename columns to be more descriptive
+- Rename columns to be more descriptive
 
-    | Old Name     | New Name        |
-    |--------------|-----------------|
-    | `date_onset` | `onset_date`    |
-    | `lat`        | `latitiude`     |
-    | `lon`        | `longitutde`    |
-    | `days_hosp`  | `hospital_days` |
+  | Old Name     | New Name        |
+  |--------------|-----------------|
+  | `date_onset` | `onset_date`    |
+  | `lat`        | `latitiude`     |
+  | `lon`        | `longitutde`    |
+  | `days_hosp`  | `hospital_days` |
 
--   Standardize messy state name values into clean, consistent categories
+- Standardize messy state name values into clean, consistent categories
 
--   Change blanks or NA values to "unknown"
+- Change blanks or NA values to "unknown"
 
--   Select only the variables we need for analysis and arrange them
+- Select only the variables we need for analysis and arrange them
 
 ```{r}
 #add cleaning code chunk here
@@ -139,7 +139,7 @@ Any number within quotations or asterisks (\*) the appropriate names/labels shou
 
 ## Step 3: Reinspect the cleaned dataframe
 
-Here is where you will count the new state_name variable to ensure you address all the spelling mistakes
+Count the new state_name variable to make sure we corrected all spelling mistakes
 
 ```{r}
 # Hint: DF_NAME %>% count(VARIABLE_NAME) to count the state_name variable
@@ -148,7 +148,7 @@ Here is where you will count the new state_name variable to ensure you address a
 
 ```
 
-Here, you will use skim() to make sure all the NAs and blanks are addressed
+Use skim() to make sure all the NAs and blanks are corrected
 
 ```{r}
 # HINT: Use skim() to re-inspect the newly cleaned dengue dataframe
@@ -157,7 +157,17 @@ Here, you will use skim() to make sure all the NAs and blanks are addressed
 
 ## Step 4: Exporting Cleaned Data
 
-Using here() and rio(), export the cleaned dataset to the "processed_data" folder and call the new file "dengue_linelist_clean.xlsx"
+Using `here` and `rio`, export the cleaned dataset to the "processed_data" folder and call the new file "dengue_linelist_clean.xlsx"
+
+**Hint -** If you see:
+
+- “could not find function ‘export’,”
+
+- "File type xlsx not supported"
+
+- Or similar errors
+
+Try to call the function with its namespace: `rio::export(...)` instead of just `export(...)`
 
 ```{r}
 # export the cleaned line-list to an Excel file in the "processed_data" folder

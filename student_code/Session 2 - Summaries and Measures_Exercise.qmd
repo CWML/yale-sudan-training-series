@@ -26,7 +26,7 @@ pacman::p_load(
 
 ## Step 1: Load the Cleaned Data
 
-Import the cleaned Dengue dataset you exported during Session 1 (*dengue_linelist_clean.xlsx*) from the `processed_data` folder using `here()` and `rio()`. Call the object `dengue_linelist`. Ensure you explicitly verify or coerce the `onset_date` column to an R Date format.
+Import the cleaned Dengue dataset you exported during the Session 1 exercise (*dengue_linelist_clean.xlsx*) from the `processed_data` folder using `here()` and `rio()`. Call the object `dengue_linelist`. Ensure you explicitly verify or coerce the `onset_date` column to an R Date format.
 
 ```{r}
 # Import cleaned dengue line-list and verify the onset_date format
@@ -37,7 +37,7 @@ dengue_linelist <- import(here("processed_data", "dengue_linelist_clean.xlsx")) 
 
 ## Step 2: Descriptive Frequency Tables
 
-Using the {janitor} package, generate descriptive tables to understand your study population. Create a simple frequency table showing the distribution of cases across different state_name values, including formatted percentages.
+Using the `janitor` package's `tabyl()` function, generate descriptive tables to understand your study population. Create a simple frequency table showing the distribution of cases across different state_name values, including formatted percentages using the `adorn_pct_formatting()` function.
 
 ```{r}
 # 1. Simple frequency table for state_names
@@ -46,7 +46,52 @@ Using the {janitor} package, generate descriptive tables to understand your stud
 
 ```
 
-Create a two-way cross-tabulation looking at sex against clinical outcome. Adorn the table to show row totals and row percentages front-facing (N (Pct%)).
+# Load packages
+
+```{r}
+pacman::p_load(
+  here,
+  rio,
+  tidyverse,
+  janitor,
+  gtsummary,
+  rstatix
+)
+```
+
+# Exercise
+
+**Use the code shown during the instruction for the cholera data as a guide. The coding pipeline and logic are identical—you just need to apply them to the Dengue dataset!**
+
+------------------------------------------------------------------------
+
+## Step 1: Load the Cleaned Data
+
+Import the cleaned Dengue dataset you exported during the Session 1 exercise (*dengue_linelist_clean.xlsx*) from the `processed_data` folder using `here()` and `rio()`. Call the object `dengue_linelist`. Ensure you explicitly verify or coerce the `onset_date` column to an R Date format.
+
+```{r}
+# Import cleaned dengue line-list and verify the onset_date format
+
+dengue_linelist <- import(here("processed_data", "dengue_linelist_clean.xlsx")) %>%
+  mutate(onset_date = as.Date(onset_date))
+```
+
+## Step 2: Descriptive Frequency Tables
+
+Using the `janitor` package's `tabyl()` function, generate descriptive tables to understand your study population. Create a simple frequency table showing the distribution of cases across different state_name values, including formatted percentages using the `adorn_pct_formatting()` function.
+
+```{r}
+# 1. Simple frequency table for state_names
+# HINT: See Simple frequency table on instructor file
+
+dengue_linelist %>% 
+  tabyl(state_name) %>% 
+  adorn_pct_formatting()
+```
+
+Create a two-way cross-tabulation looking at `sex` and `outcome`.
+
+Adorn the table to show **row totals** and front-facing row percentages with a single decimal point.
 
 ```{r}
 # 2. Adorned two-way table for sex vs. outcome
@@ -59,8 +104,8 @@ Create a two-way cross-tabulation looking at sex against clinical outcome. Adorn
 
 We want to evaluate the demographic profile of our cases.
 
-- Use {rstatix} to calculate the overall summary statistics for age.
-- Perform a statistical hypothesis test to determine if the continuous variable age differs significantly across different clinical outcome groups (e.g., recovered vs. death vs. hospitalised).
+- Use the `rstatix` package to calculate the overall summary statistics for age.
+- Perform a statistical hypothesis test to determine if the continuous variable **age** differs significantly across different clinical **outcome** groups (e.g., recovered vs. death vs. hospitalised).
 
 **Hint: Check the distribution of age first to decide if you should use a parametric (ANOVA) or non-parametric (Kruskal-Wallis) approach!**
 
@@ -70,7 +115,7 @@ We want to evaluate the demographic profile of our cases.
 
 ```
 
-For this let's compare the age distribution of dengue cases between different outcomes
+Now, let's compare the age distribution of dengue cases between different **outcomes**
 
 ```{r}
 # Run the appropriate hypothesis test for age across outcome groups
@@ -83,7 +128,7 @@ For this let's compare the age distribution of dengue cases between different ou
 
 ## Step 4: Constructing a Publication-Ready "Table 1"
 
-Using the {gtsummary} package, assemble a comprehensive baseline characteristics table (tbl_summary) stratified by outcome.
+Using the `gtsummary` package, assemble a comprehensive baseline characteristics table `tbl_summary` stratified by **outcome**.
 
 - Include age, sex, state name, and key symptoms (like fever or joint pain).
 - Add an overall sample size column (add_n()).
@@ -134,7 +179,7 @@ Calculate the clinical severity of this outbreak using your case-only surveillan
 
 - First, write a pipeline using summarise() to calculate the overall global CFR for the entire dataset.
 
-- Next, modify that pipeline using group_by() to calculate and compare the CFR across different states (state_name). Identify which state is experiencing the highest clinical lethality.
+- Next, modify that pipeline using group_by() to calculate and compare the CFR across different states (**state_name**). Identify which state is experiencing the highest clinical lethality.
 
 **Hint: Find the following numbers in the code chunk and replace them with the appropriate words or symbols. Dataframe name**
 
@@ -157,6 +202,8 @@ global_cfr
 
 ## Step 5.2 Calculate and compare the CFR across different states
 
+Now, let's calculate a CRF for each state by adding a `group_by()` function above the `sumarise()` function and include **state_name.**
+
 ```{r}
 # Calculate CFR by state
 cfr_by_state <- 1 %>% 
@@ -173,11 +220,11 @@ cfr_by_state
 
 Because surveillance officers frequently operate without population denominators or control groups, you must evaluate shifts in exposure trends purely among known cases.
 
-- Use filter() and dplyr::between() to extract cases occurring during the first week of the outbreak (e.g., January 1 to January 7, 2025). Pass this filtered data to janitor::tabyl() to look at the proportion of a key environmental risk factor like standing water proximity (water_container_status).
+1.  Use the `dplyr` package's `filter()` and `between()` functions to extract cases occurring during the first week of the outbreak (e.g., January 1 to January 7, 2025).
 
-- Duplicate that pipeline and adjust the date filter to capture cases from the last week of data in the spreadsheet. Compare your proportions. Did the exposure footprint shift?
+2.  Pass this filtered data to the `janitor` packge's `tabyl()` function to look at the proportion of a key environmental risk factor like standing water proximity (water_container_status).
 
-\*\* Hint: Find the following numbers in the code chunk and replace them with the appropriate words or variable names.\*\*
+**Hint: Find the following numbers in the code chunk and replace them with the appropriate words or variable names.**
 
 1.  Dataframe name
 2.  Date of symptom onset variable
@@ -197,7 +244,9 @@ Because surveillance officers frequently operate without population denominators
 
 ## Step 6.2 Proportional Morbidity for the Late Phase (e.g., Feb 1 - Feb 7, 2025)
 
-**IMPORTANT: runt he code the first time then comment out the first date line and uncomment the second date line to compare the two weeks**
+Now we will adjust the date range to see what happens to the results and compare to the previous week (step 6.1)
+
+**IMPORTANT: run the code the first time then comment out the first date line and uncomment the second date line to compare the two weeks**
 
 ```{r}
 1 %>%
