@@ -1,10 +1,19 @@
-.Rproj.user
+# R / RStudio
+.Rproj.user/
 .Rhistory
 .RData
 .Ruserdata
+.Renviron
+
+# Quarto
+*_cache/
+.quarto/
+
+# OS / Office / editor clutter
+.DS_Store
+~$*
+.positron/
+.vscode/
 
 # Ignore any folder whose name is exactly "Notes" (at any depth)
 **/Notes/
-
-# Ignore auto-generated folder outputs from R Markdown / Quarto
-*_cache/.DS_Store
